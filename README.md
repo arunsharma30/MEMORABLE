@@ -1,10 +1,10 @@
-# 🎬 Memorable — OTT Subscription Management System
+# Memorable — OTT Subscription Management System
 
 A full-stack **Database Management System (DBMS) Mini Project** built as a Netflix-inspired OTT platform. Users can browse content, manage subscriptions, track watch history, and view payment records — all powered by a **MySQL** backend and a **Node.js/Express** REST API.
 
 ---
 
-## 📸 Project Overview
+## Project Overview
 
 Memorable is a web-based OTT (Over-The-Top) streaming platform management system that demonstrates core DBMS concepts including:
 - Relational database design with ER diagrams
@@ -14,7 +14,7 @@ Memorable is a web-based OTT (Over-The-Top) streaming platform management system
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -26,7 +26,7 @@ Memorable is a web-based OTT (Over-The-Top) streaming platform management system
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 memorable/
@@ -48,7 +48,7 @@ memorable/
 
 ---
 
-## 🗄️ Database Schema
+## Database Schema
 
 The database `netflixdb` contains **6 tables**:
 
@@ -73,7 +73,7 @@ Subscription_Plan ◄──── Subscription ────► User
 
 ---
 
-## ⚙️ Setup & Installation
+## Setup & Installation
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) (v16 or above)
@@ -121,7 +121,7 @@ http://localhost:3000/index.html
 
 ---
 
-## 🔑 Demo Login
+## Demo Login
 
 | Field | Value |
 |---|---|
@@ -130,7 +130,7 @@ http://localhost:3000/index.html
 
 ---
 
-## 🌐 API Endpoints
+## API Endpoints
 
 | Method | Endpoint | Description |
 |---|---|---|
@@ -147,7 +147,7 @@ http://localhost:3000/index.html
 
 ---
 
-## 🗃️ Key SQL Queries
+## Key SQL Queries
 
 **1. All active subscribers with their plan:**
 ```sql
@@ -185,19 +185,19 @@ WHERE Payment_Status = 'Completed';
 
 ---
 
-## ✨ Features
+## Features
 
-- 🔐 User Authentication (Login & Register)
-- 🎬 Browse content with search, genre & language filters
-- ⭐ Subscription plan management (Basic / Standard / Premium)
-- 🕐 Watch history tracking with stats
-- 💳 Payment history with transaction details
-- 📱 Responsive sidebar navigation
-- 🌙 Full dark theme UI
+-  User Authentication (Login & Register)
+-  Browse content with search, genre & language filters
+-  Subscription plan management (Basic / Standard / Premium)
+-  Watch history tracking with stats
+-  Payment history with transaction details
+-  Responsive sidebar navigation
+-  Full dark theme UI
 
 ---
 
-## 👥 Sample Users (Pre-loaded)
+## Sample Users (Pre-loaded)
 
 | Name | Email | Password |
 |---|---|---|
@@ -206,7 +206,7 @@ WHERE Payment_Status = 'Completed';
 
 ---
 
-## 📝 Subscription Plans
+## Subscription Plans
 
 | Plan | Price | Quality | Screens |
 |---|---|---|---|
@@ -216,7 +216,7 @@ WHERE Payment_Status = 'Completed';
 
 ---
 
-## 🎓 Academic Context
+## Academic Context
 
 This project was developed as a **DBMS Mini Project** to demonstrate:
 - ER Diagram to Relational Schema conversion
@@ -229,7 +229,7 @@ This project was developed as a **DBMS Mini Project** to demonstrate:
 
 ---
 
-## 📄 License
+## License
 
 This project is built for educational purposes as part of a DBMS course mini project.
 
