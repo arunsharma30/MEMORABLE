@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Subscription – Memorable</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--red:#e50914;--red2:#b81d24;--bg:#141414;--card:#1c1c1c;--card2:#222;--muted:#aaa;--border:#2e2e2e;--sidebar:240px}
+body{background:var(--bg);color:#fff;font-family:'DM Sans',sans-serif;display:flex;min-height:100vh}
+.sidebar{width:var(--sidebar);background:#0d0d0d;border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100}
+.sidebar .logo{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--red);padding:28px 24px 20px;letter-spacing:2px;border-bottom:1px solid var(--border)}
+.sidebar nav{flex:1;padding:16px 0}
+.sidebar nav a{display:flex;align-items:center;gap:12px;padding:13px 24px;color:var(--muted);text-decoration:none;font-size:.92rem;transition:.2s;border-left:3px solid transparent}
+.sidebar nav a svg{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;transition:.2s}
+.sidebar nav a:hover,.sidebar nav a.active{color:#fff;background:rgba(229,9,20,.07);border-left-color:var(--red)}
+.sidebar-footer{padding:20px 24px;border-top:1px solid var(--border)}
+.sidebar-footer .uname{font-size:.85rem;color:#fff;font-weight:500;margin-bottom:2px}
+.sidebar-footer .uemail{font-size:.75rem;color:var(--muted)}
+.sidebar-footer button{display:inline-block;margin-top:12px;padding:6px 14px;background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:.8rem;cursor:pointer;transition:.2s;font-family:'DM Sans',sans-serif}
+.sidebar-footer button:hover{border-color:var(--red);color:var(--red)}
+.main{margin-left:var(--sidebar);flex:1;padding:40px 48px}
+.page-header{margin-bottom:32px}
+.page-header h1{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:1px}
+.page-header p{color:var(--muted);font-size:.9rem;margin-top:4px}
+.current-sub{background:linear-gradient(135deg,rgba(229,9,20,.08),rgba(229,9,20,.02));border:1px solid rgba(229,9,20,.25);border-radius:16px;padding:28px;margin-bottom:36px}
+.current-sub h2{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:1px;margin-bottom:16px}
+.sub-detail{display:flex;gap:32px;flex-wrap:wrap;margin-bottom:16px}
+.sub-item .label{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.sub-item .value{font-size:1rem;color:#fff;font-weight:500}
+.feat-row{display:flex;gap:10px;flex-wrap:wrap}
+.feat-chip{display:inline-flex;align-items:center;gap:6px;background:#1a1a1a;border:1px solid var(--border);padding:6px 14px;border-radius:20px;font-size:.78rem;color:#ccc}
+.divider{border:none;border-top:1px solid var(--border);margin:32px 0}
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.plan-card{background:var(--card2);border:2px solid var(--border);border-radius:16px;padding:28px;text-align:center;transition:.25s;cursor:pointer;position:relative}
+.plan-card:hover,.plan-card.selected{border-color:var(--red);background:rgba(229,9,20,.04)}
+.recommended{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--red);color:#fff;font-size:.72rem;padding:3px 14px;border-radius:20px;font-weight:600;letter-spacing:.5px}
+.plan-name{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:1px}
+.plan-price{font-size:2.2rem;font-weight:300;margin:12px 0}
+.plan-price span{font-size:.9rem;color:var(--muted)}
+.plan-card ul{list-style:none;margin:16px 0;text-align:left}
+.plan-card ul li{padding:6px 0;font-size:.85rem;color:#ccc;display:flex;align-items:center;gap:8px}
+.plan-card ul li::before{content:'✓';color:var(--red);font-weight:700}
+.btn-select{width:100%;padding:12px;background:var(--red);border:none;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1.5px;border-radius:8px;cursor:pointer;transition:.2s;margin-top:8px}
+.btn-select:hover{background:var(--red2)}
+.payment-form{margin-top:32px}
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.form-group select,.form-group input{width:100%;padding:12px 16px;background:#111;border:1px solid var(--border);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:.9rem}
+.form-group select:focus,.form-group input:focus{outline:none;border-color:var(--red)}
+.form-group select option{background:#1f1f1f}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.btn-subscribe{padding:14px 36px;background:var(--red);border:none;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1.5px;border-radius:8px;cursor:pointer;transition:.2s}
+.btn-subscribe:hover{background:var(--red2);transform:translateY(-1px)}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.73rem;font-weight:500}
+.badge.active{background:rgba(46,213,115,.15);color:#2ed573}
+.badge.inactive,.badge.cancelled{background:rgba(255,255,255,.08);color:#aaa}
+.loading{text-align:center;padding:40px;color:var(--muted)}
+.empty{text-align:center;padding:40px;color:var(--muted)}
+.empty .emoji{font-size:3rem;margin-bottom:12px}
+.toast{position:fixed;bottom:30px;right:30px;background:#1f1f1f;border:1px solid var(--border);border-radius:10px;padding:14px 20px;font-size:.87rem;z-index:9999;transform:translateY(100px);opacity:0;transition:.3s}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:rgba(46,213,115,.4);color:#2ed573}
+.toast.error{border-color:rgba(229,9,20,.4);color:#ff6b6b}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="logo">Memorable</div>
+  <nav>
+    <a href="browse.html">
+      <svg viewBox="0 0 24 24">
+        <rect x="3" y="5" width="18" height="14" rx="2" ry="2"/>
+        <path d="M10 8v8M14 8v8"/>
+      </svg>
+      Browse
+    </a>
+    <a href="subscription.html" class="active">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+      </svg>
+      Subscription
+    </a>
+    <a href="history.html">
+      <svg viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+      Watch History
+    </a>
+    <a href="payments.html">
+      <svg viewBox="0 0 24 24">
+        <rect x="2" y="5" width="20" height="14" rx="2" ry="2"/>
+        <line x1="2" y1="10" x2="22" y2="10"/>
+      </svg>
+      Payments
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="uname" id="uname"></div>
+    <div class="uemail" id="uemail"></div>
+    <button onclick="logout()">Sign Out</button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header"><h1>Subscription</h1><p>Manage your plan and billing</p></div>
+  <div id="current-sub-wrap"><div class="loading">Loading...</div></div>
+  <div class="divider"></div>
+  <div class="page-header"><h1>Choose a Plan</h1><p>Select the plan that works best for you</p></div>
+  <div class="plans-grid" id="plans-grid"><div class="loading">Loading plans...</div></div>
+  <div class="payment-form" id="payment-form" style="display:none">
+    <div class="divider"></div>
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:1px;margin-bottom:20px">Complete Your Order</h2>
+    <div class="form-row">
+      <div class="form-group"><label>Selected Plan</label><input type="text" id="sel-plan" readonly style="opacity:.6"/></div>
+      <div class="form-group"><label>Amount</label><input type="text" id="sel-price" readonly style="opacity:.6"/></div>
+    </div>
+    <div class="form-group">
+      <label>Payment Method</label>
+      <select id="pay-method"><option>UPI</option><option>Credit Card</option><option>Debit Card</option><option>Net Banking</option><option>Wallet</option></select>
+    </div>
+    <button class="btn-subscribe" onclick="subscribe()">SUBSCRIBE NOW</button>
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+const API='http://localhost:3000/api';
+const u=sessionStorage.getItem('user');
+if(!u)window.location.href='index.html';
+const user=JSON.parse(u||'{}');
+document.getElementById('uname').textContent=user.Name||'';
+document.getElementById('uemail').textContent=user.Email||'';
+function logout(){sessionStorage.removeItem('user');window.location.href='index.html';}
+function toast(msg,type='success'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type}`;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+
+let selectedPlanId=null;
+
+async function loadCurrentSub(){
+  const wrap=document.getElementById('current-sub-wrap');
+  try{
+    const r=await fetch(`${API}/subscription/${user.User_ID}`);
+    const s=await r.json();
+    if(!s){wrap.innerHTML=`<div class="empty"><div class="emoji">📭</div><p>No active subscription. Choose a plan below.</p></div>`;return;}
+    const ds=new Date(s.Start_Date).toLocaleDateString('en-IN',{year:'numeric',month:'long',day:'numeric'});
+    const de=new Date(s.End_Date).toLocaleDateString('en-IN',{year:'numeric',month:'long',day:'numeric'});
+    wrap.innerHTML=`
+      <div class="current-sub">
+        <h2>Current Subscription</h2>
+        <div class="sub-detail">
+          <div class="sub-item"><div class="label">Plan</div><div class="value">${s.Plan_Name}</div></div>
+          <div class="sub-item"><div class="label">Status</div><div class="value"><span class="badge ${s.Status.toLowerCase()}">${s.Status}</span></div></div>
+          <div class="sub-item"><div class="label">Start Date</div><div class="value">${ds}</div></div>
+          <div class="sub-item"><div class="label">Renewal Date</div><div class="value">${de}</div></div>
+          <div class="sub-item"><div class="label">Price</div><div class="value">₹${s.Price}/yr</div></div>
+        </div>
+        <div class="feat-row">
+          <span class="feat-chip">🎥 ${s.Video_Quality} Quality</span>
+          <span class="feat-chip">📱 ${s.Max_Screens} Screen${s.Max_Screens>1?'s':''}</span>
+        </div>
+      </div>`;
+  }catch(e){wrap.innerHTML=`<div class="empty"><p>${e.message}</p></div>`;}
+}
+
+async function loadPlans(){
+  const grid=document.getElementById('plans-grid');
+  try{
+    const r=await fetch(`${API}/plans`);
+    const plans=await r.json();
+    grid.innerHTML=plans.map((p,i)=>`
+      <div class="plan-card">
+        ${i===1?'<div class="recommended">MOST POPULAR</div>':''}
+        <div class="plan-name">${p.Plan_Name}</div>
+        <div class="plan-price">₹${p.Price}<span>/year</span></div>
+        <ul>
+          <li>${p.Video_Quality} Video Quality</li>
+          <li>${p.Max_Screens} Screen${p.Max_Screens>1?'s':''} simultaneously</li>
+          <li>Unlimited content access</li>
+          <li>Download on mobile</li>
+        </ul>
+        <button class="btn-select" onclick="selectPlan(${p.Plan_ID},'${p.Plan_Name}',${p.Price})">SELECT ${p.Plan_Name.toUpperCase()}</button>
+      </div>`).join('');
+  }catch(e){grid.innerHTML=`<div class="loading">${e.message}</div>`;}
+}
+
+function selectPlan(id,name,price){
+  selectedPlanId=id;
+  document.getElementById('sel-plan').value=name;
+  document.getElementById('sel-price').value=`₹${price}`;
+  document.getElementById('payment-form').style.display='block';
+  document.getElementById('payment-form').scrollIntoView({behavior:'smooth'});
+}
+
+async function subscribe(){
+  if(!selectedPlanId)return;
+  const pm=document.getElementById('pay-method').value;
+  try{
+    const r=await fetch(`${API}/subscribe`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:user.User_ID,plan_id:selectedPlanId,payment_method:pm})});
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.error);
+    toast('Subscription activated! 🎉');
+    setTimeout(()=>{loadCurrentSub();document.getElementById('payment-form').style.display='none';},1000);
+  }catch(e){toast(e.message,'error');}
+}
+
+loadCurrentSub();
+loadPlans();
+</script>
+</body>
+</html>

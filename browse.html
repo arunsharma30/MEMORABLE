@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Browse – Memorable</title>
+<meta name="description" content="Browse our extensive catalog of 200+ movies and series on Memorable – your premium OTT platform."/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --red:#e50914;--red2:#b81d24;--red-glow:rgba(229,9,20,.35);
+  --bg:#0a0a0a;--bg2:#111;--card:#161616;--card-hover:#1e1e1e;
+  --muted:#888;--muted2:#666;--border:#1e1e1e;--sidebar:240px;
+  --glass:rgba(255,255,255,.04);--glass2:rgba(255,255,255,.07);
+}
+body{background:var(--bg);color:#fff;font-family:'DM Sans',sans-serif;display:flex;min-height:100vh;overflow-x:hidden}
+::selection{background:var(--red);color:#fff}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:#333;border-radius:3px}::-webkit-scrollbar-track{background:transparent}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar);background:#080808;border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100}
+.sidebar .logo{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--red);padding:28px 24px 20px;letter-spacing:3px;border-bottom:1px solid var(--border);text-shadow:0 0 30px var(--red-glow)}
+.sidebar nav{flex:1;padding:16px 0}
+.sidebar nav a{display:flex;align-items:center;gap:12px;padding:13px 24px;color:var(--muted);text-decoration:none;font-size:.9rem;transition:.25s;border-left:3px solid transparent}
+.sidebar nav a svg{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;transition:.25s}
+.sidebar nav a:hover,.sidebar nav a.active{color:#fff;background:rgba(229,9,20,.08);border-left-color:var(--red)}
+.sidebar-footer{padding:20px 24px;border-top:1px solid var(--border)}
+.sidebar-footer .uname{font-size:.85rem;color:#fff;font-weight:500;margin-bottom:2px}
+.sidebar-footer .uemail{font-size:.75rem;color:var(--muted)}
+.sidebar-footer button{display:inline-block;margin-top:12px;padding:6px 14px;background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:.8rem;cursor:pointer;transition:.25s;font-family:'DM Sans',sans-serif}
+.sidebar-footer button:hover{border-color:var(--red);color:var(--red)}
+
+/* ── MAIN ── */
+.main{margin-left:var(--sidebar);flex:1;padding:32px 40px 60px}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(135deg,#1a0505 0%,#0d0d1a 50%,#0a1a0a 100%);border-radius:20px;padding:44px 52px;margin-bottom:32px;border:1px solid #1e1e1e;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:260px;height:260px;background:radial-gradient(circle,rgba(229,9,20,.12),transparent 70%);border-radius:50%;filter:blur(40px)}
+.hero::after{content:'';position:absolute;bottom:-40px;left:30%;width:200px;height:200px;background:radial-gradient(circle,rgba(80,40,200,.08),transparent 70%);border-radius:50%;filter:blur(30px)}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:3.2rem;letter-spacing:3px;position:relative;z-index:1}
+.hero h1 span{color:var(--red)}
+.hero p{color:#777;margin-top:8px;font-size:.95rem;position:relative;z-index:1}
+.hero .stats{display:flex;gap:32px;margin-top:20px;position:relative;z-index:1}
+.hero .stat{text-align:center}
+.hero .stat .num{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--red);letter-spacing:1px}
+.hero .stat .label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+
+/* ── CONTROLS ── */
+.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:12px}
+.search-box{position:relative;flex:1;min-width:240px;max-width:400px}
+.search-box input{width:100%;padding:11px 16px 11px 42px;background:#141414;border:1px solid var(--border);border-radius:10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:.88rem;transition:.3s}
+.search-box input:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 3px rgba(229,9,20,.15)}
+.search-box input::placeholder{color:#555}
+.search-box svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;stroke:#555;stroke-width:2;fill:none}
+.sort-select{padding:10px 14px;background:#141414;border:1px solid var(--border);border-radius:10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;transition:.3s}
+.sort-select:focus{outline:none;border-color:var(--red)}
+.sort-select option{background:#1a1a1a}
+.results-count{font-size:.82rem;color:var(--muted);margin-left:auto}
+
+/* ── GENRE TABS ── */
+.genre-tabs{display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap}
+.genre-tab{padding:7px 18px;border-radius:24px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:.8rem;cursor:pointer;transition:.3s;font-family:'DM Sans',sans-serif;letter-spacing:.3px;position:relative;overflow:hidden}
+.genre-tab::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--red),#ff4d4d);opacity:0;transition:.3s}
+.genre-tab span{position:relative;z-index:1}
+.genre-tab:hover{border-color:var(--red);color:#fff}
+.genre-tab.active{border-color:var(--red);color:#fff}
+.genre-tab.active::before{opacity:1}
+
+/* ── SECTION TITLE ── */
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.section-header h2{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:1.5px;color:#ddd}
+.section-header .line{flex:1;height:1px;background:linear-gradient(to right,var(--border),transparent)}
+
+/* ── GRID ── */
+.content-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px}
+
+/* ── CARD ── */
+.movie-card{background:#111;border-radius:12px;overflow:hidden;cursor:pointer;transition:transform .3s ease,box-shadow .3s ease;position:relative}
+.movie-card:hover{transform:scale(1.05);box-shadow:0 16px 40px rgba(0,0,0,.6),0 0 20px rgba(229,9,20,.1)}
+
+/* ── POSTER AREA ── */
+.poster{height:220px;position:relative;overflow:hidden}
+.poster::before{content:'';position:absolute;inset:0;z-index:0}
+
+/* ── RATING BADGE (top-right corner) ── */
+.rating{position:absolute;top:10px;right:10px;background:var(--red);color:#fff;font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:4px;z-index:3;letter-spacing:.5px;line-height:1.2}
+
+/* ── INFO SECTION ── */
+.info{padding:14px 14px 10px}
+.info h3{font-size:.95rem;font-weight:600;line-height:1.3;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#fff}
+.info .meta{font-size:.75rem;color:#888;margin-bottom:8px;letter-spacing:.2px}
+.genre-badge{display:inline-block;padding:3px 12px;border-radius:20px;font-size:.68rem;font-weight:500;letter-spacing:.3px;width:fit-content;margin-bottom:10px}
+
+/* ── WATCH BUTTON ── */
+.watch-btn{width:calc(100% - 28px);margin:0 14px 14px;padding:9px;border:1px solid #333;background:transparent;color:#999;border-radius:8px;cursor:pointer;font-size:.78rem;font-family:'DM Sans',sans-serif;transition:.3s;letter-spacing:.3px;text-align:center}
+.watch-btn:hover{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 4px 16px rgba(229,9,20,.3)}
+
+/* ── GENRE COLORS ── */
+.genre-action{background:rgba(231,76,60,.15);color:#e74c3c;border:1px solid rgba(231,76,60,.25)}
+.genre-thriller{background:rgba(192,57,43,.15);color:#e74c3c;border:1px solid rgba(192,57,43,.25)}
+.genre-comedy{background:rgba(241,196,15,.15);color:#f1c40f;border:1px solid rgba(241,196,15,.25)}
+.genre-drama{background:rgba(155,89,182,.15);color:#bb86fc;border:1px solid rgba(155,89,182,.25)}
+.genre-sci-fi{background:rgba(52,152,219,.15);color:#3498db;border:1px solid rgba(52,152,219,.25)}
+.genre-crime{background:rgba(230,126,34,.15);color:#e67e22;border:1px solid rgba(230,126,34,.25)}
+.genre-horror{background:rgba(231,76,60,.15);color:#ff4444;border:1px solid rgba(231,76,60,.3)}
+.genre-fantasy{background:rgba(22,160,133,.15);color:#1abc9c;border:1px solid rgba(22,160,133,.25)}
+.genre-romance{background:rgba(255,105,180,.15);color:#ff69b4;border:1px solid rgba(255,105,180,.25)}
+
+/* ── POSTER GRADIENTS PER GENRE ── */
+.card-genre-action .poster::before{background:linear-gradient(180deg,#1a0a08 0%,#0d0604 60%,#000 100%)}
+.card-genre-thriller .poster::before{background:linear-gradient(180deg,#1a0808 0%,#0d0404 60%,#000 100%)}
+.card-genre-comedy .poster::before{background:linear-gradient(180deg,#1a1808 0%,#0d0c04 60%,#000 100%)}
+.card-genre-drama .poster::before{background:linear-gradient(180deg,#140a1a 0%,#0a050d 60%,#000 100%)}
+.card-genre-sci-fi .poster::before{background:linear-gradient(180deg,#081018 0%,#04080c 60%,#000 100%)}
+.card-genre-crime .poster::before{background:linear-gradient(180deg,#1a1008 0%,#0d0804 60%,#000 100%)}
+.card-genre-horror .poster::before{background:linear-gradient(180deg,#1a0505 0%,#0d0303 60%,#000 100%)}
+.card-genre-fantasy .poster::before{background:linear-gradient(180deg,#081a14 0%,#040d0a 60%,#000 100%)}
+.card-genre-romance .poster::before{background:linear-gradient(180deg,#1a0818 0%,#0d040c 60%,#000 100%)}
+
+/* ── LOAD MORE ── */
+.load-more-wrap{text-align:center;margin-top:36px}
+.load-more-btn{padding:12px 48px;background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:10px;font-size:.9rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.3s;letter-spacing:.5px}
+.load-more-btn:hover{border-color:var(--red);color:var(--red);box-shadow:0 0 20px rgba(229,9,20,.15)}
+
+/* ── EMPTY ── */
+.empty-state{grid-column:1/-1;text-align:center;padding:80px 20px;color:var(--muted)}
+.empty-state .icon{font-size:4rem;margin-bottom:16px;opacity:.3}
+.empty-state p{font-size:.95rem}
+.empty-state .sub{font-size:.8rem;color:var(--muted2);margin-top:6px}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:30px;right:30px;background:#1a1a1a;border:1px solid var(--border);border-radius:12px;padding:14px 22px;font-size:.87rem;z-index:9999;transform:translateY(100px);opacity:0;transition:.4s cubic-bezier(.4,0,.2,1);box-shadow:0 12px 40px rgba(0,0,0,.6);backdrop-filter:blur(10px)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:rgba(46,213,115,.4);color:#2ed573}
+.toast.error{border-color:rgba(229,9,20,.4);color:#ff6b6b}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.movie-card{animation:fadeInUp .4s ease both}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.88);backdrop-filter:blur(6px);z-index:9000;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:60px 20px}
+.modal-overlay.active{display:flex}
+@keyframes modalIn{from{opacity:0;transform:translateY(30px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+.modal-card{background:#111;border-radius:14px;width:100%;max-width:620px;overflow:hidden;animation:modalIn .35s ease both;box-shadow:0 30px 80px rgba(0,0,0,.7);position:relative}
+.modal-poster{height:120px;position:relative;overflow:hidden}
+.modal-poster::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,#1a1a1a 0%,#000 100%)}
+.modal-poster::after{content:'';position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(transparent,#111)}
+.modal-body{padding:0 32px 28px}
+.modal-body h1{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:2px;margin-bottom:10px;line-height:1.1}
+.modal-meta{display:flex;align-items:center;gap:10px;font-size:.88rem;color:#aaa;margin-bottom:16px;flex-wrap:wrap}
+.modal-meta .age-badge{background:var(--red);color:#fff;padding:2px 8px;border-radius:4px;font-size:.75rem;font-weight:700;letter-spacing:.5px}
+.modal-rating-row{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.imdb-badge{background:#f5c518;color:#000;font-weight:700;font-size:.78rem;padding:5px 12px;border-radius:6px;letter-spacing:.3px}
+.modal-stars{color:#f5c518;font-size:1rem;letter-spacing:2px}
+.modal-desc{color:#bbb;font-size:.9rem;line-height:1.65;margin-bottom:24px}
+.modal-info-box{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:18px 22px;margin-bottom:24px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modal-info-box .info-label{font-size:.7rem;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+.modal-info-box .info-value{font-size:.92rem;font-weight:500;color:#ddd}
+.modal-buttons{display:flex;gap:10px}
+.modal-buttons button{flex:1;padding:13px 16px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:.3s;letter-spacing:.5px;border:none;text-transform:uppercase}
+.btn-watch{background:var(--red);color:#fff}
+.btn-watch:hover{background:#ff1a25;box-shadow:0 6px 20px rgba(229,9,20,.4)}
+.btn-watchlist{background:#222;color:#ccc;border:1px solid #333 !important}
+.btn-watchlist:hover{border-color:var(--red) !important;color:#fff}
+.btn-close-modal{background:#222;color:#888;border:1px solid #333 !important}
+.btn-close-modal:hover{color:#fff;border-color:#555 !important}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .sidebar{display:none}
+  .main{margin-left:0;padding:20px 16px}
+  .hero{padding:28px 24px}
+  .hero h1{font-size:2rem}
+  .content-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+  .modal-overlay{padding:30px 12px}
+  .modal-body{padding:0 20px 22px}
+  .modal-body h1{font-size:1.6rem}
+  .modal-buttons{flex-direction:column}
+}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="logo">Memorable</div>
+  <nav>
+    <a href="browse.html" class="active">
+      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" ry="2"/><path d="M10 8v8M14 8v8"/></svg>
+      Browse
+    </a>
+    <a href="subscription.html">
+      <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      Subscription
+    </a>
+    <a href="history.html">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Watch History
+    </a>
+    <a href="payments.html">
+      <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      Payments
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="uname" id="uname"></div>
+    <div class="uemail" id="uemail"></div>
+    <button onclick="logout()">Sign Out</button>
+  </div>
+</aside>
+
+<main class="main">
+  <!-- HERO -->
+  <div class="hero">
+    <h1>Explore <span>200+</span> Titles</h1>
+    <p>Movies, web series, anime & more — all in one place</p>
+    <div class="stats">
+      <div class="stat"><div class="num" id="totalCount">0</div><div class="label">Titles</div></div>
+      <div class="stat"><div class="num" id="genreCount">0</div><div class="label">Genres</div></div>
+      <div class="stat"><div class="num" id="langCount">0</div><div class="label">Languages</div></div>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="searchInput" placeholder="Search movies, series, anime..." oninput="debounceRender()"/>
+    </div>
+    <select class="sort-select" id="sortSelect" onchange="renderMovies()">
+      <option value="default">Sort: Default</option>
+      <option value="title-asc">Title A→Z</option>
+      <option value="title-desc">Title Z→A</option>
+      <option value="rating-desc">Rating High→Low</option>
+      <option value="rating-asc">Rating Low→High</option>
+    </select>
+    <div class="results-count" id="resultsCount"></div>
+  </div>
+
+  <!-- GENRE TABS -->
+  <div class="genre-tabs" id="genreTabs"></div>
+
+  <!-- SECTION HEADER -->
+  <div class="section-header">
+    <h2 id="sectionTitle">All Titles</h2>
+    <div class="line"></div>
+  </div>
+
+  <!-- GRID -->
+  <div id="grid" class="content-grid"></div>
+
+  <!-- LOAD MORE -->
+  <div class="load-more-wrap" id="loadMoreWrap" style="display:none">
+    <button class="load-more-btn" id="loadMoreBtn" onclick="loadMore()">Load More</button>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<!-- MOVIE MODAL -->
+<div class="modal-overlay" id="movieModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-card">
+    <div class="modal-poster" id="modalPoster"></div>
+    <div class="modal-body">
+      <h1 id="modalTitle"></h1>
+      <div class="modal-meta" id="modalMeta"></div>
+      <div class="modal-rating-row">
+        <span class="imdb-badge" id="modalImdb"></span>
+        <span class="modal-stars" id="modalStars"></span>
+      </div>
+      <p class="modal-desc" id="modalDesc"></p>
+      <div class="modal-info-box" id="modalInfo"></div>
+      <div class="modal-buttons">
+        <button class="btn-watch" id="modalWatchBtn">Watch Now</button>
+        <button class="btn-watchlist" id="modalWatchlistBtn">Add to Watchlist</button>
+        <button class="btn-close-modal" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+//  AUTH
+// ════════════════════════════════════════════════════════════════
+const u=sessionStorage.getItem('user');
+if(!u)window.location.href='index.html';
+const user=JSON.parse(u||'{}');
+document.getElementById('uname').textContent=user.Name||'';
+document.getElementById('uemail').textContent=user.Email||'';
+function logout(){sessionStorage.removeItem('user');window.location.href='index.html';}
+
+// ════════════════════════════════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════════════════════════════════
+const API='http://localhost:3000/api';
+function toast(msg,type='success'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.classList.remove('show'),3000);}
+
+// ════════════════════════════════════════════════════════════════
+//  WATCH MOVIE (API call)
+// ════════════════════════════════════════════════════════════════
+async function watchMovie(movie){
+  try{
+    const r=await fetch(`${API}/watch`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        user_id:user.User_ID,
+        title:movie.title,
+        genre:movie.genre,
+        language:movie.language,
+        duration:movie.duration
+      })
+    });
+    const d=await r.json();
+    if(r.ok){
+      toast(`Added '${movie.title}' to watch history ✓`,'success');
+    }else{
+      toast(d.error||'Failed to save','error');
+    }
+  }catch(e){
+    toast('Server unreachable — is backend running?','error');
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+//  MOVIE DESCRIPTIONS
+// ════════════════════════════════════════════════════════════════
+const movieDesc={
+1:"A post-apocalyptic road warrior joins a rebellious woman to flee a tyrant and his army in an explosive high-speed chase across the wasteland.",
+2:"A retired hitman seeks vengeance after his beloved dog is killed, unleashing a relentless rampage through the criminal underworld.",
+3:"John Wick is forced back into the criminal underworld as he takes on a blood oath debt, facing deadlier assassins than ever before.",
+4:"John Wick uncovers a path to defeating the High Table, but must face his most lethal adversaries in a globe-trotting battle.",
+5:"Batman faces the Joker, a criminal mastermind who plunges Gotham into chaos and tests the limits of heroism and morality.",
+6:"A betrayed Roman general rises as a gladiator, seeking justice against the corrupt emperor who destroyed his family.",
+7:"After decades away, a legendary fighter pilot returns to train a new generation for a dangerous mission that demands the ultimate sacrifice.",
+8:"Ethan Hunt and his team race against time to prevent a global catastrophe in the most dangerous mission they have ever faced.",
+9:"The Avengers assemble for a final stand against Thanos, risking everything to undo the devastation and restore the universe.",
+10:"Two legendary revolutionaries join forces against British colonial rule in a stunning tale of friendship, rebellion, and sacrifice.",
+11:"A young man rises from poverty to become the most feared gangster in the gold mining underworld, sparking a brutal power struggle.",
+12:"A secret agent embarks on a high-stakes mission across continents to neutralize a global terror threat with deadly precision.",
+13:"An Indian soldier and a rogue agent face off in a battle of wits, skills, and patriotism in this high-octane spy thriller.",
+14:"Indian Air Force pilots engage in a daring aerial mission to protect the nation from an imminent enemy strike.",
+15:"A covert operation unfolds as an elite team works to prevent a massive terror attack on Indian soil.",
+16:"A black-market mercenary is hired to extract the kidnapped son of an international crime lord in a brutally intense rescue mission.",
+17:"A rookie cop is trapped inside a building overrun by ruthless gangsters and must fight floor by floor to survive.",
+18:"A young muay thai fighter uses his extraordinary martial arts skills to recover a stolen sacred artifact from a ruthless gang.",
+19:"A former assassin embarks on a bloody quest for revenge against the people who betrayed her, wielding a legendary samurai sword.",
+20:"A retired intelligence operative comes out of hiding to protect a young girl from a network of corruption and violence.",
+21:"A village guardian protects his land and traditions from outside forces in a visually stunning tale rooted in folklore and mysticism.",
+22:"A laborer rises through the ranks of the red sandalwood smuggling syndicate, becoming a feared and celebrated outlaw.",
+23:"Three Spider-Men from different universes unite to battle villains from across the multiverse in a spectacular showdown.",
+24:"An unassuming family man reveals a lethal set of skills when criminals push him beyond his breaking point.",
+25:"An MI6 agent navigates Cold War espionage and betrayal in Berlin, using her deadly combat skills to survive.",
+26:"Two detectives hunt a serial killer who uses the seven deadly sins as his modus operandi in a dark, rain-soaked city.",
+27:"A cartoonist becomes obsessed with a serial killer terrorizing San Francisco, pursuing the case across decades.",
+28:"A woman disappears on her wedding anniversary, and the ensuing investigation turns the spotlight on her seemingly perfect husband.",
+29:"A father takes the law into his own hands when his daughter and her friend go missing, spiraling into moral darkness.",
+30:"A U.S. Marshal investigates a disappearance at a remote psychiatric facility, uncovering disturbing truths about the island and himself.",
+31:"A hunter and a retired sheriff pursue a psychopathic killer across the Texas desert in a gripping tale of fate and violence.",
+32:"An idealistic FBI agent is drawn into a dangerous covert operation targeting a powerful drug cartel at the U.S.–Mexico border.",
+33:"A blind pianist accidentally witnesses a murder and gets entangled in a web of deceit in this darkly comic thriller.",
+34:"A man orchestrates an elaborate cover-up to protect his family after an accidental death threatens to destroy their lives.",
+35:"The sequel continues the gripping story of a family's desperate measures to conceal their darkest secret from the authorities.",
+36:"A pregnant woman arrives in Kolkata searching for her missing husband and uncovers a conspiracy far bigger than she imagined.",
+37:"An ordinary man holds an entire city hostage and challenges the police to uncover the truth behind recent terror attacks.",
+38:"A man is imprisoned for 15 years without explanation and is suddenly released, embarking on a violent quest for answers.",
+39:"A poor family schemes their way into a wealthy household, but their plan unravels with devastating and darkly humorous consequences.",
+40:"A detective investigates Korea's first serial murders in a rural town, facing frustration and obsession as the case goes cold.",
+41:"A young FBI trainee seeks the help of an imprisoned cannibalistic serial killer to catch another killer on the loose.",
+42:"A driven young man blurs the line between ambition and ethics as he builds a career filming Los Angeles crime scenes.",
+43:"A young drummer enrolls at a prestigious music conservatory where a tyrannical instructor pushes him beyond all limits.",
+44:"An undercover cop and a mole in the police force race to identify each other in Boston's violent Irish-American crime scene.",
+45:"Two rival magicians in Victorian London engage in an escalating battle of illusions, each obsessed with creating the ultimate trick.",
+46:"A journalist and a young hacker investigate a wealthy family's dark secrets and a decades-old disappearance.",
+47:"A detective chases a serial killer through the dark streets of Seoul in a relentless race against time.",
+48:"A secret agent captures a serial killer but becomes consumed by a dangerous game of cat and mouse with the psychopath.",
+49:"A troubled detective investigates mysterious drownings in Mumbai, uncovering a connection to the supernatural.",
+50:"A school teacher discovers a pattern in child disappearances and hunts a psychopathic serial killer terrorizing the city.",
+51:"A banker sentenced to life in a corrupt prison befriends a fellow inmate and finds hope through acts of common decency.",
+52:"A slow-witted but kind man witnesses and influences several historic events in 20th-century America through his extraordinary life journey.",
+53:"The aging patriarch transfers control of his organized crime dynasty to his reluctant youngest son. Masterpiece exploring power, family, and loyalty.",
+54:"A German industrialist saves over a thousand Jewish lives during the Holocaust by employing them in his factories.",
+55:"Twelve jurors deliberate the fate of a young man accused of murder in a tense examination of justice and prejudice.",
+56:"An insomniac office worker and a soap salesman form an underground fight club that evolves into something far more dangerous.",
+57:"The story of J. Robert Oppenheimer and the creation of the atomic bomb, exploring the moral complexities of scientific discovery.",
+58:"A struggling salesman and his young son endure homelessness while he pursues an unpaid internship that could change their lives.",
+59:"A troubled mathematical genius working as a janitor is discovered by a professor who helps him confront his demons.",
+60:"A brilliant mathematician struggles with schizophrenia as he tries to make sense of reality and his groundbreaking work.",
+61:"Three college friends challenge India's rigid education system in this heartwarming comedy about following your passion over convention.",
+62:"A caring teacher discovers that a struggling student's academic difficulties stem from dyslexia and transforms his life through empathy.",
+63:"A group of university friends are inspired by a revolutionary freedom fighter and stand up against corruption in modern India.",
+64:"A small village in colonial India accepts a challenge to play cricket against the British to avoid paying unfair taxes.",
+65:"A NASA scientist returns to his Indian village and grapples with the contrast between modern technology and rural traditions.",
+66:"Based on a true story, a father trains his daughters to become world-class wrestlers against all societal expectations.",
+67:"A city-bred engineer adjusts to life as secretary of a remote village, finding humor, friendship, and purpose in rural India.",
+68:"The true story of Harshad Mehta, the stockbroker who single-handedly took on the system and pulled off India's biggest financial scam.",
+69:"A lavish drama chronicles the reign of Queen Elizabeth II and the political and personal events that shaped the second Elizabethan era.",
+70:"A powerful family controls one of the biggest media conglomerates, and a battle for succession exposes their darkest ambitions.",
+71:"A small-time lawyer navigates the criminal justice system and gradually transforms into a morally complex anti-hero.",
+72:"Students in Kota navigate the intense pressure of competitive exam preparation in this heartfelt coming-of-age story.",
+73:"A gangster family rises to power in post-World War I Birmingham, navigating politics, crime, and family loyalty.",
+74:"A high school chemistry teacher turns to manufacturing methamphetamine to secure his family's future after a cancer diagnosis.",
+75:"A deep dive into the Baltimore drug scene through the eyes of law enforcement and drug dealers, revealing systemic failures.",
+76:"A team of explorers travels through a wormhole near Saturn in search of a new home for humanity as Earth faces extinction.",
+77:"A thief who steals corporate secrets through dream-sharing technology is given a chance to erase his criminal record by planting an idea.",
+78:"A computer hacker discovers reality is a simulation and joins a rebellion against the machines controlling humanity.",
+79:"A blade runner uncovers a long-buried secret that leads him to seek out a former blade runner who has been missing for decades.",
+80:"A linguist is recruited to communicate with alien visitors, discovering that their language holds the key to understanding time itself.",
+81:"A noble family navigates politics and warfare on a desert planet that holds the galaxy's most vital resource.",
+82:"The epic continuation of Paul Atreides' journey as he unites with the Fremen to wage war and fulfill his destiny.",
+83:"A paraplegic Marine is dispatched to the moon Pandora, where he becomes torn between following orders and protecting an alien civilization.",
+84:"Jake Sully returns to Pandora and must protect his family from a renewed human threat while exploring the ocean regions of the moon.",
+85:"An astronaut stranded on Mars must use his ingenuity to survive and find a way to signal Earth for rescue.",
+86:"A young programmer is selected to evaluate an advanced humanoid AI, uncovering unsettling truths about consciousness and manipulation.",
+87:"A soldier caught in a time loop relives a battle against alien invaders, growing stronger with each reset until he finds the key to victory.",
+88:"Two astronauts are stranded in space after their shuttle is destroyed, fighting for survival with dwindling oxygen.",
+89:"A protagonist navigates a twilight world of international espionage using time inversion technology to prevent World War III.",
+90:"An anthology series exploring the dark side of technology, each episode presenting a standalone cautionary tale about the near future.",
+91:"Three interconnected families unravel a time-travel conspiracy spanning several generations in a small German town.",
+92:"A group of kids in a small Indiana town confront supernatural forces and secret government experiments in the 1980s.",
+93:"Employees of a corporation discover their memories are surgically divided between work and personal lives, uncovering sinister truths.",
+94:"A futuristic theme park populated by advanced androids begins to malfunction, leading to chaos and self-awareness.",
+95:"Survivors navigate a post-apocalyptic United States ravaged by a fungal infection, forging bonds in a brutal world.",
+96:"A self-proclaimed mad scientist accidentally discovers time travel via a modified microwave, triggering dangerous consequences.",
+97:"A biologist enters a mysterious quarantined zone where the laws of nature don't apply, confronting terrifying transformations.",
+98:"A young man rises through the ranks of the New York Mafia in a story of ambition, loyalty, and violent excess.",
+99:"The lives of two hitmen, a boxer, a gangster, and his wife intertwine in a series of violent and oddly comedic events.",
+100:"A stockbroker's meteoric rise on Wall Street is fueled by greed, corruption, and excess in this outrageous true story.",
+101:"A Cuban immigrant rises from dishwasher to drug kingpin in Miami, consumed by power and paranoia.",
+102:"Two boys growing up in the slums of Rio de Janeiro take different paths — one becomes a photographer, the other a drug dealer.",
+103:"An epic saga of power, politics, and revenge spanning generations of a coal-mining family in rural India.",
+104:"A conflicted police officer is drawn into the criminal underworld of Mumbai as he hunts a powerful gangster.",
+105:"A family of outlaws rules a lawless town with an iron fist until new rivals and the law threaten their empire.",
+106:"The rise and fall of Pablo Escobar and the Medellín Cartel, told through the eyes of a DEA agent.",
+107:"A financial advisor is forced to launder money for a drug cartel, relocating his family to the Ozarks and descending into darkness.",
+108:"A group of robbers carries out an elaborate heist on the Royal Mint of Spain, captivating the world with their audacity.",
+109:"The powerful patriarch of a New Jersey crime family struggles to balance the demands of his personal and professional life.",
+110:"An artist with a talent for counterfeiting gets drawn into the dangerous world of fake currency, testing loyalties and morality.",
+111:"A forensic expert and a serial killer inspired by Indian mythology engage in a deadly intellectual battle.",
+112:"An FBI agent studies the psychology of serial killers by interviewing imprisoned murderers to solve ongoing cases.",
+113:"A pair of detectives investigate a series of ritualistic murders across decades in the Louisiana bayou.",
+114:"A middle-class intelligence officer leads a double life, battling terrorists and personal crises in this gripping spy thriller.",
+115:"A secret ops team carries out covert missions to neutralize threats to national security across multiple countries.",
+116:"A woman enters the male-dominated world of drug trafficking to protect her family after her husband is arrested.",
+117:"An obsessive detective and a master thief play a high-stakes game of cat and mouse across Los Angeles.",
+118:"A casino mogul's empire crumbles under greed, betrayal, and the violent machinations of organized crime.",
+119:"A rookie LAPD officer discovers his decorated training partner is deeply corrupt during a harrowing day on the streets.",
+120:"Paranormal investigators Ed and Lorraine Warren confront a powerful demonic entity terrorizing a family in their farmhouse.",
+121:"The Warrens travel to London to help a single mother and her daughter, who are tormented by a malevolent spirit.",
+122:"After the death of their grandmother, a family begins to unravel terrifying secrets about their ancestry and inherited evil.",
+123:"A young African-American man visits his white girlfriend's family estate, uncovering a sinister conspiracy beneath their liberal facade.",
+124:"A family lives in silence to avoid creatures that hunt by sound, navigating a tense and terrifying new world.",
+125:"A family retreats to an isolated hotel for the winter where a sinister presence influences the father into violence.",
+126:"A group of children faces their deepest fears when a shape-shifting clown terrorizes their small town.",
+127:"A couple travels to a remote Swedish village for a midsummer festival that becomes increasingly sinister and disturbing.",
+128:"A priest investigates the case of a young girl believed to be possessed by a demonic entity, confronting pure evil.",
+129:"A family is attacked by doppelgängers who emerge from underground, forcing them to fight for survival.",
+130:"Passengers on a train to Busan must fight for survival when a zombie outbreak ravages the country.",
+131:"A mysterious stranger arrives in a quiet village, triggering a chain of unexplainable and horrifying events.",
+132:"A man pursues a mythical treasure hidden in a cursed village, encountering ancient horrors and greed-driven madness.",
+133:"A tailor in a small town confronts a female ghost who terrorizes the local men, blending horror with comedy.",
+134:"The sequel continues the saga of Vicky and the mysterious Stree, as a new supernatural threat emerges in the town.",
+135:"A man claims to be the reincarnation of a ghost and must navigate a haunted mansion full of comedy and scares.",
+136:"A family moves into a haunted mansion and experiences terrifying events that reveal the house's dark past.",
+137:"A young au pair discovers that the ghosts of a country estate are trapped by their own unfinished stories.",
+138:"An isolated island community grapples with the arrival of a charismatic priest whose miracles carry a terrible cost.",
+139:"Supernatural beings appear on Earth to condemn sinners to hell, causing panic and the rise of a fanatical cult.",
+140:"Students trapped in a high school must survive a zombie apocalypse that rapidly spreads through the city.",
+141:"Hundreds of cash-strapped contestants accept an invitation to play deadly children's games for a massive prize.",
+142:"A young hobbit inherits a ring of great power and embarks on an epic journey to destroy it and save Middle-earth.",
+143:"The fellowship is broken as the remaining members battle the forces of Sauron while Frodo continues his perilous quest.",
+144:"The final battle for Middle-earth unfolds as Frodo reaches Mount Doom and Aragorn claims his rightful throne.",
+145:"An orphaned boy discovers he is a wizard and begins his education at Hogwarts School of Witchcraft and Wizardry.",
+146:"Harry learns about his godfather and confronts a dangerous escaped prisoner in the most time-bending year at Hogwarts.",
+147:"The final battle between Harry and Voldemort reaches its climax in an epic showdown at Hogwarts.",
+148:"A hobbit is recruited by a wizard and a company of dwarves on a quest to reclaim their homeland from a dragon.",
+149:"Noble families vie for control of the Iron Throne in a world of political intrigue, war, and dragons.",
+150:"A monster hunter struggles to find his place in a world where humans and magical creatures are at odds.",
+151:"Set centuries before Game of Thrones, the Targaryen civil war tears a family and kingdom apart.",
+152:"The daughter of the Addams family navigates a new school while solving a supernatural mystery and discovering her powers.",
+153:"The Devil himself abandons Hell to live in Los Angeles, becoming a consultant to the LAPD.",
+154:"An orphan with magical abilities is thrust into a war between light and darkness across a ravaged fantasy world.",
+155:"A young woman from a remote village discovers she has the power to summon light and challenge the Shadow Fold.",
+156:"A young woman from a quiet Korean village discovers extraordinary powers and enters a prestigious magical academy.",
+157:"A warrior-prince leads a rebellion against a tyrannical ruler in this stunning visual epic of ancient India.",
+158:"The epic conclusion reveals the origins of Bahubali's exile and his son's quest to reclaim the throne.",
+159:"A DJ discovers he possesses an ancient celestial weapon and must unite supernatural forces to fight an impending evil.",
+160:"Doctor Strange confronts alternate realities and a new threat that could destroy the multiverse.",
+161:"A young girl discovers a magical labyrinth ruled by a faun, escaping the horrors of post-Civil War Spain.",
+162:"Four children discover a magical wardrobe that leads to the enchanted land of Narnia, where they must defeat an evil queen.",
+163:"Adopted siblings with extraordinary powers reunite to solve their father's mysterious death and prevent an apocalypse.",
+164:"A legendary concierge and his protégé navigate a comedic caper involving stolen artwork and a family fortune.",
+165:"Two high school seniors embark on a wild night of misadventures before graduating, trying to make unforgettable memories.",
+166:"Three friends wake up after a wild bachelor party in Las Vegas with no memory and must retrace their steps to find the groom.",
+167:"Three unemployed men hatch a hilarious kidnapping scheme that goes wrong at every turn in this iconic comedy.",
+168:"Two best friends with clashing personalities create constant chaos in this beloved slapstick comedy classic.",
+169:"Four friends go on a road trip that spirals into outrageous chaos, delivering non-stop laughs and mayhem.",
+170:"A tailor in a haunted town teams up with friends to save the village from a mischievous ghost, blending laughs with scares.",
+171:"College friends reunite years later and reflect on their glory days and the choices that shaped their lives.",
+172:"An unconventional doctor uses humor and compassion to heal patients, challenging the medical establishment's rigid rules.",
+173:"An alien visitor questions humanity's religious practices and social norms in this thought-provoking satirical comedy.",
+174:"A young man faces an embarrassing medical condition that complicates his arranged marriage in this charming comedy.",
+175:"A paper company's daily operations become the setting for unforgettable workplace humor and heartwarming relationships.",
+176:"Six friends navigate life, love, and careers in New York City in this iconic and endlessly quotable sitcom.",
+177:"A diverse group of detectives solve crimes while dealing with their quirky boss in this hilarious police precinct comedy.",
+178:"An American football coach takes over a struggling English soccer team, winning hearts with optimism and kindness.",
+179:"A wealthy family loses everything and moves to a small town, finding humor and growth in their new circumstances.",
+180:"A dry-witted woman navigates modern life, relationships, and personal grief with brutal honesty and dark humor.",
+181:"A deceased woman discovers she's in the afterlife and must earn her place in the Good Place through moral growth.",
+182:"A group of misfits in Silicon Valley struggle to build a tech startup while navigating the absurdity of the industry.",
+183:"The beloved secretary returns to his village for another season of warmth, humor, and rural adventures.",
+184:"A 1950s housewife discovers a talent for stand-up comedy and pursues a career on the New York comedy circuit.",
+185:"A foul-mouthed vice president and her incompetent staff stumble through American politics in this razor-sharp satire.",
+186:"An aspiring actress and a jazz musician fall in love while pursuing their dreams in Los Angeles.",
+187:"A young aristocrat falls in love with a free-spirited artist aboard the doomed maiden voyage of the RMS Titanic.",
+188:"A couple's epic love story unfolds across decades, told through the pages of an old notebook.",
+189:"Two strangers meet on a train to Vienna and spend an unforgettable night walking the city and sharing their lives.",
+190:"Nine years after their first meeting, the couple reunites in Paris for a single afternoon of conversation and connection.",
+191:"A spirited young woman falls for a charming stranger on a European train journey, defying her family's wishes for love.",
+192:"A spirited young woman meets a reserved man on a train, and their instant connection transforms both their lives.",
+193:"Two lovers from rival nations share an impossible romance that spans borders, war, and decades of longing.",
+194:"A passionate musician embarks on a turbulent journey of love, loss, and self-destruction in pursuit of artistic truth.",
+195:"A heartbroken singer and a rising star fall tragically in love in this emotionally intense musical romance.",
+196:"A South Korean heiress crash-lands in North Korea and falls for a soldier in a forbidden cross-border love story.",
+197:"A career woman and her boss scheme to avoid a blind date, only to fall for each other in this charming workplace romance.",
+198:"A young woman navigates Regency-era London's high society in search of love, guided by mystery and scandal.",
+199:"Two Irish college students navigate an intense, complicated relationship that evolves over several years.",
+200:"A spirited young woman challenges societal expectations and finds an unexpected love match in 19th-century England.",
+201:"A couple erases each other from their memories, only to rediscover their connection in a bittersweet journey of love and loss.",
+202:"A young man reflects on a failed relationship, reinterpreting the moments that defined their 500 days together.",
+203:"A shy young woman embarks on a solo honeymoon trip to Paris after her wedding is called off, discovering her true self.",
+204:"A fun-loving young man celebrates life and friendship on an unforgettable road trip, unaware that love awaits him at the journey's end.",
+205:"An alien celebrity lands on Earth and falls in love with a spirited human, creating havoc and humor in this fantasy romance."
+};
+function getDesc(m){return movieDesc[m.id]||`${m.title} is a captivating ${m.genre.toLowerCase()} ${m.duration==='Series'?'series':'film'} that delivers an unforgettable experience with stellar performances and a gripping narrative.`;}
+function getAgeRating(m){const r=parseFloat(m.rating);return r>=8.5?'R':r>=7.5?'TV-MA':r>=6.5?'TV-14':'PG-13';}
+function getYear(m){const d=m.duration;return d==='Series'?'Series':['Action','Thriller'].includes(m.genre)?'2023':['Drama','Crime'].includes(m.genre)?'2022':['Sci-Fi','Horror'].includes(m.genre)?'2021':['Fantasy','Comedy'].includes(m.genre)?'2020':'2019';}
+function getStars(r){const n=Math.round(parseFloat(r)/2);return '★'.repeat(n)+'☆'.repeat(5-n);}
+
+function openModal(id){
+  const m=movies.find(x=>x.id===id);
+  if(!m)return;
+  document.getElementById('modalTitle').textContent=m.title;
+  const ageRating=getAgeRating(m);
+  const year=getYear(m);
+  document.getElementById('modalMeta').innerHTML=
+    `<span>${m.language}</span><span>${m.duration}</span><span class="age-badge">${ageRating}</span><span>${year}</span>`;
+  document.getElementById('modalImdb').textContent=`IMDB ${m.rating}/10`;
+  document.getElementById('modalStars').textContent=getStars(m.rating);
+  document.getElementById('modalDesc').textContent=getDesc(m);
+  document.getElementById('modalInfo').innerHTML=
+    `<div class="info-item"><div class="info-label">Genre</div><div class="info-value">${m.genre}</div></div>`+
+    `<div class="info-item"><div class="info-label">Type</div><div class="info-value">${m.duration==='Series'?'Series':'Movie'}</div></div>`+
+    `<div class="info-item"><div class="info-label">Content ID</div><div class="info-value">${m.id}</div></div>`;
+  // Wire up buttons
+  document.getElementById('modalWatchBtn').onclick=()=>{closeModal();watchMovie(m);};
+  document.getElementById('modalWatchlistBtn').onclick=()=>{toast(`Added '${m.title}' to watchlist`,'success');};
+  document.getElementById('movieModal').classList.add('active');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){
+  document.getElementById('movieModal').classList.remove('active');
+  document.body.style.overflow='';
+}
+
+// ════════════════════════════════════════════════════════════════
+//  MOVIE DATASET (~200 TITLES)
+// ════════════════════════════════════════════════════════════════
+const movies=[
+// ── ACTION (25) ──
+{id:1,title:"Mad Max: Fury Road",genre:"Action",language:"English",duration:"120m",rating:"8.1"},
+{id:2,title:"John Wick",genre:"Action",language:"English",duration:"101m",rating:"7.4"},
+{id:3,title:"John Wick: Chapter 2",genre:"Action",language:"English",duration:"122m",rating:"7.5"},
+{id:4,title:"John Wick: Chapter 4",genre:"Action",language:"English",duration:"169m",rating:"7.7"},
+{id:5,title:"The Dark Knight",genre:"Action",language:"English",duration:"152m",rating:"9.0"},
+{id:6,title:"Gladiator",genre:"Action",language:"English",duration:"155m",rating:"8.5"},
+{id:7,title:"Top Gun: Maverick",genre:"Action",language:"English",duration:"130m",rating:"8.3"},
+{id:8,title:"Mission: Impossible – Fallout",genre:"Action",language:"English",duration:"147m",rating:"7.7"},
+{id:9,title:"Avengers: Endgame",genre:"Action",language:"English",duration:"181m",rating:"8.4"},
+{id:10,title:"RRR",genre:"Action",language:"Telugu",duration:"187m",rating:"7.8"},
+{id:11,title:"KGF: Chapter 2",genre:"Action",language:"Kannada",duration:"168m",rating:"7.5"},
+{id:12,title:"Pathaan",genre:"Action",language:"Hindi",duration:"146m",rating:"6.6"},
+{id:13,title:"War",genre:"Action",language:"Hindi",duration:"154m",rating:"6.5"},
+{id:14,title:"Fighter",genre:"Action",language:"Hindi",duration:"166m",rating:"5.8"},
+{id:15,title:"Baby",genre:"Action",language:"Hindi",duration:"159m",rating:"7.1"},
+{id:16,title:"Extraction",genre:"Action",language:"English",duration:"116m",rating:"6.7"},
+{id:17,title:"The Raid",genre:"Action",language:"Indonesian",duration:"101m",rating:"7.6"},
+{id:18,title:"Ong-Bak",genre:"Action",language:"Thai",duration:"105m",rating:"7.2"},
+{id:19,title:"Kill Bill: Vol. 1",genre:"Action",language:"English",duration:"111m",rating:"8.2"},
+{id:20,title:"The Equalizer",genre:"Action",language:"English",duration:"132m",rating:"7.2"},
+{id:21,title:"Kantara",genre:"Action",language:"Kannada",duration:"148m",rating:"7.8"},
+{id:22,title:"Pushpa: The Rise",genre:"Action",language:"Telugu",duration:"179m",rating:"7.6"},
+{id:23,title:"Spider-Man: No Way Home",genre:"Action",language:"English",duration:"148m",rating:"8.2"},
+{id:24,title:"Nobody",genre:"Action",language:"English",duration:"92m",rating:"7.4"},
+{id:25,title:"Atomic Blonde",genre:"Action",language:"English",duration:"115m",rating:"6.7"},
+
+// ── THRILLER (25) ──
+{id:26,title:"Se7en",genre:"Thriller",language:"English",duration:"127m",rating:"8.6"},
+{id:27,title:"Zodiac",genre:"Thriller",language:"English",duration:"157m",rating:"7.7"},
+{id:28,title:"Gone Girl",genre:"Thriller",language:"English",duration:"149m",rating:"8.1"},
+{id:29,title:"Prisoners",genre:"Thriller",language:"English",duration:"153m",rating:"8.1"},
+{id:30,title:"Shutter Island",genre:"Thriller",language:"English",duration:"138m",rating:"8.2"},
+{id:31,title:"No Country for Old Men",genre:"Thriller",language:"English",duration:"122m",rating:"8.2"},
+{id:32,title:"Sicario",genre:"Thriller",language:"English",duration:"121m",rating:"7.6"},
+{id:33,title:"Andhadhun",genre:"Thriller",language:"Hindi",duration:"139m",rating:"8.3"},
+{id:34,title:"Drishyam",genre:"Thriller",language:"Hindi",duration:"163m",rating:"8.2"},
+{id:35,title:"Drishyam 2",genre:"Thriller",language:"Hindi",duration:"142m",rating:"7.5"},
+{id:36,title:"Kahaani",genre:"Thriller",language:"Hindi",duration:"122m",rating:"8.1"},
+{id:37,title:"A Wednesday!",genre:"Thriller",language:"Hindi",duration:"104m",rating:"8.1"},
+{id:38,title:"Oldboy",genre:"Thriller",language:"Korean",duration:"120m",rating:"8.4"},
+{id:39,title:"Parasite",genre:"Thriller",language:"Korean",duration:"132m",rating:"8.5"},
+{id:40,title:"Memories of Murder",genre:"Thriller",language:"Korean",duration:"131m",rating:"8.1"},
+{id:41,title:"The Silence of the Lambs",genre:"Thriller",language:"English",duration:"118m",rating:"8.6"},
+{id:42,title:"Nightcrawler",genre:"Thriller",language:"English",duration:"117m",rating:"7.9"},
+{id:43,title:"Whiplash",genre:"Thriller",language:"English",duration:"106m",rating:"8.5"},
+{id:44,title:"The Departed",genre:"Thriller",language:"English",duration:"151m",rating:"8.5"},
+{id:45,title:"The Prestige",genre:"Thriller",language:"English",duration:"130m",rating:"8.5"},
+{id:46,title:"The Girl with the Dragon Tattoo",genre:"Thriller",language:"English",duration:"158m",rating:"7.8"},
+{id:47,title:"The Chaser",genre:"Thriller",language:"Korean",duration:"125m",rating:"7.9"},
+{id:48,title:"I Saw the Devil",genre:"Thriller",language:"Korean",duration:"141m",rating:"7.8"},
+{id:49,title:"Talaash",genre:"Thriller",language:"Hindi",duration:"139m",rating:"7.2"},
+{id:50,title:"Ratsasan",genre:"Thriller",language:"Tamil",duration:"170m",rating:"8.3"},
+
+// ── DRAMA (25) ──
+{id:51,title:"The Shawshank Redemption",genre:"Drama",language:"English",duration:"142m",rating:"9.3"},
+{id:52,title:"Forrest Gump",genre:"Drama",language:"English",duration:"142m",rating:"8.8"},
+{id:53,title:"The Godfather",genre:"Drama",language:"English",duration:"175m",rating:"9.2"},
+{id:54,title:"Schindler's List",genre:"Drama",language:"English",duration:"195m",rating:"9.0"},
+{id:55,title:"12 Angry Men",genre:"Drama",language:"English",duration:"96m",rating:"9.0"},
+{id:56,title:"Fight Club",genre:"Drama",language:"English",duration:"139m",rating:"8.8"},
+{id:57,title:"Oppenheimer",genre:"Drama",language:"English",duration:"180m",rating:"8.3"},
+{id:58,title:"The Pursuit of Happyness",genre:"Drama",language:"English",duration:"117m",rating:"8.0"},
+{id:59,title:"Good Will Hunting",genre:"Drama",language:"English",duration:"126m",rating:"8.3"},
+{id:60,title:"A Beautiful Mind",genre:"Drama",language:"English",duration:"135m",rating:"8.2"},
+{id:61,title:"3 Idiots",genre:"Drama",language:"Hindi",duration:"170m",rating:"8.4"},
+{id:62,title:"Taare Zameen Par",genre:"Drama",language:"Hindi",duration:"165m",rating:"8.4"},
+{id:63,title:"Rang De Basanti",genre:"Drama",language:"Hindi",duration:"167m",rating:"8.1"},
+{id:64,title:"Lagaan",genre:"Drama",language:"Hindi",duration:"224m",rating:"8.1"},
+{id:65,title:"Swades",genre:"Drama",language:"Hindi",duration:"189m",rating:"8.2"},
+{id:66,title:"Dangal",genre:"Drama",language:"Hindi",duration:"161m",rating:"8.4"},
+{id:67,title:"Panchayat",genre:"Drama",language:"Hindi",duration:"Series",rating:"8.8"},
+{id:68,title:"Scam 1992",genre:"Drama",language:"Hindi",duration:"Series",rating:"9.3"},
+{id:69,title:"The Crown",genre:"Drama",language:"English",duration:"Series",rating:"8.6"},
+{id:70,title:"Succession",genre:"Drama",language:"English",duration:"Series",rating:"8.8"},
+{id:71,title:"Better Call Saul",genre:"Drama",language:"English",duration:"Series",rating:"8.9"},
+{id:72,title:"Kota Factory",genre:"Drama",language:"Hindi",duration:"Series",rating:"8.6"},
+{id:73,title:"Peaky Blinders",genre:"Drama",language:"English",duration:"Series",rating:"8.8"},
+{id:74,title:"Breaking Bad",genre:"Drama",language:"English",duration:"Series",rating:"9.5"},
+{id:75,title:"The Wire",genre:"Drama",language:"English",duration:"Series",rating:"9.3"},
+
+// ── SCI-FI (22) ──
+{id:76,title:"Interstellar",genre:"Sci-Fi",language:"English",duration:"169m",rating:"8.7"},
+{id:77,title:"Inception",genre:"Sci-Fi",language:"English",duration:"148m",rating:"8.8"},
+{id:78,title:"The Matrix",genre:"Sci-Fi",language:"English",duration:"136m",rating:"8.7"},
+{id:79,title:"Blade Runner 2049",genre:"Sci-Fi",language:"English",duration:"164m",rating:"8.0"},
+{id:80,title:"Arrival",genre:"Sci-Fi",language:"English",duration:"116m",rating:"7.9"},
+{id:81,title:"Dune: Part One",genre:"Sci-Fi",language:"English",duration:"155m",rating:"8.0"},
+{id:82,title:"Dune: Part Two",genre:"Sci-Fi",language:"English",duration:"166m",rating:"8.5"},
+{id:83,title:"Avatar",genre:"Sci-Fi",language:"English",duration:"162m",rating:"7.9"},
+{id:84,title:"Avatar: The Way of Water",genre:"Sci-Fi",language:"English",duration:"192m",rating:"7.6"},
+{id:85,title:"The Martian",genre:"Sci-Fi",language:"English",duration:"144m",rating:"8.0"},
+{id:86,title:"Ex Machina",genre:"Sci-Fi",language:"English",duration:"108m",rating:"7.7"},
+{id:87,title:"Edge of Tomorrow",genre:"Sci-Fi",language:"English",duration:"113m",rating:"7.9"},
+{id:88,title:"Gravity",genre:"Sci-Fi",language:"English",duration:"91m",rating:"7.7"},
+{id:89,title:"Tenet",genre:"Sci-Fi",language:"English",duration:"150m",rating:"7.3"},
+{id:90,title:"Black Mirror",genre:"Sci-Fi",language:"English",duration:"Series",rating:"8.8"},
+{id:91,title:"Dark",genre:"Sci-Fi",language:"German",duration:"Series",rating:"8.8"},
+{id:92,title:"Stranger Things",genre:"Sci-Fi",language:"English",duration:"Series",rating:"8.7"},
+{id:93,title:"Severance",genre:"Sci-Fi",language:"English",duration:"Series",rating:"8.7"},
+{id:94,title:"Westworld",genre:"Sci-Fi",language:"English",duration:"Series",rating:"8.5"},
+{id:95,title:"The Last of Us",genre:"Sci-Fi",language:"English",duration:"Series",rating:"8.8"},
+{id:96,title:"Steins;Gate",genre:"Sci-Fi",language:"Japanese",duration:"Series",rating:"8.8"},
+{id:97,title:"Annihilation",genre:"Sci-Fi",language:"English",duration:"115m",rating:"6.8"},
+
+// ── CRIME (22) ──
+{id:98,title:"Goodfellas",genre:"Crime",language:"English",duration:"146m",rating:"8.7"},
+{id:99,title:"Pulp Fiction",genre:"Crime",language:"English",duration:"154m",rating:"8.9"},
+{id:100,title:"The Wolf of Wall Street",genre:"Crime",language:"English",duration:"180m",rating:"8.2"},
+{id:101,title:"Scarface",genre:"Crime",language:"English",duration:"170m",rating:"8.3"},
+{id:102,title:"City of God",genre:"Crime",language:"Portuguese",duration:"130m",rating:"8.6"},
+{id:103,title:"Gangs of Wasseypur",genre:"Crime",language:"Hindi",duration:"321m",rating:"8.2"},
+{id:104,title:"Sacred Games",genre:"Crime",language:"Hindi",duration:"Series",rating:"8.6"},
+{id:105,title:"Mirzapur",genre:"Crime",language:"Hindi",duration:"Series",rating:"8.5"},
+{id:106,title:"Narcos",genre:"Crime",language:"English",duration:"Series",rating:"8.8"},
+{id:107,title:"Ozark",genre:"Crime",language:"English",duration:"Series",rating:"8.5"},
+{id:108,title:"Money Heist",genre:"Crime",language:"Spanish",duration:"Series",rating:"8.2"},
+{id:109,title:"The Sopranos",genre:"Crime",language:"English",duration:"Series",rating:"9.2"},
+{id:110,title:"Farzi",genre:"Crime",language:"Hindi",duration:"Series",rating:"8.0"},
+{id:111,title:"Asur",genre:"Crime",language:"Hindi",duration:"Series",rating:"8.4"},
+{id:112,title:"Mindhunter",genre:"Crime",language:"English",duration:"Series",rating:"8.6"},
+{id:113,title:"True Detective",genre:"Crime",language:"English",duration:"Series",rating:"8.9"},
+{id:114,title:"The Family Man",genre:"Crime",language:"Hindi",duration:"Series",rating:"8.7"},
+{id:115,title:"Special OPS",genre:"Crime",language:"Hindi",duration:"Series",rating:"8.4"},
+{id:116,title:"Aarya",genre:"Crime",language:"Hindi",duration:"Series",rating:"7.8"},
+{id:117,title:"Heat",genre:"Crime",language:"English",duration:"170m",rating:"8.3"},
+{id:118,title:"Casino",genre:"Crime",language:"English",duration:"178m",rating:"8.2"},
+{id:119,title:"Training Day",genre:"Crime",language:"English",duration:"122m",rating:"7.7"},
+
+// ── HORROR (22) ──
+{id:120,title:"The Conjuring",genre:"Horror",language:"English",duration:"112m",rating:"7.5"},
+{id:121,title:"The Conjuring 2",genre:"Horror",language:"English",duration:"134m",rating:"7.3"},
+{id:122,title:"Hereditary",genre:"Horror",language:"English",duration:"127m",rating:"7.3"},
+{id:123,title:"Get Out",genre:"Horror",language:"English",duration:"104m",rating:"7.7"},
+{id:124,title:"A Quiet Place",genre:"Horror",language:"English",duration:"90m",rating:"7.5"},
+{id:125,title:"The Shining",genre:"Horror",language:"English",duration:"146m",rating:"8.4"},
+{id:126,title:"It",genre:"Horror",language:"English",duration:"135m",rating:"7.3"},
+{id:127,title:"Midsommar",genre:"Horror",language:"English",duration:"148m",rating:"7.1"},
+{id:128,title:"The Exorcist",genre:"Horror",language:"English",duration:"122m",rating:"8.1"},
+{id:129,title:"Us",genre:"Horror",language:"English",duration:"116m",rating:"6.8"},
+{id:130,title:"Train to Busan",genre:"Horror",language:"Korean",duration:"118m",rating:"7.6"},
+{id:131,title:"The Wailing",genre:"Horror",language:"Korean",duration:"156m",rating:"7.4"},
+{id:132,title:"Tumbbad",genre:"Horror",language:"Hindi",duration:"104m",rating:"8.3"},
+{id:133,title:"Stree",genre:"Horror",language:"Hindi",duration:"129m",rating:"7.6"},
+{id:134,title:"Stree 2",genre:"Horror",language:"Hindi",duration:"150m",rating:"7.1"},
+{id:135,title:"Bhool Bhulaiyaa 2",genre:"Horror",language:"Hindi",duration:"143m",rating:"5.7"},
+{id:136,title:"The Haunting of Hill House",genre:"Horror",language:"English",duration:"Series",rating:"8.6"},
+{id:137,title:"The Haunting of Bly Manor",genre:"Horror",language:"English",duration:"Series",rating:"7.4"},
+{id:138,title:"Midnight Mass",genre:"Horror",language:"English",duration:"Series",rating:"7.7"},
+{id:139,title:"Hellbound",genre:"Horror",language:"Korean",duration:"Series",rating:"6.7"},
+{id:140,title:"All of Us Are Dead",genre:"Horror",language:"Korean",duration:"Series",rating:"7.5"},
+{id:141,title:"Squid Game",genre:"Horror",language:"Korean",duration:"Series",rating:"8.0"},
+
+// ── FANTASY (22) ──
+{id:142,title:"The Lord of the Rings: Fellowship",genre:"Fantasy",language:"English",duration:"178m",rating:"8.8"},
+{id:143,title:"The Lord of the Rings: Two Towers",genre:"Fantasy",language:"English",duration:"179m",rating:"8.8"},
+{id:144,title:"The Lord of the Rings: Return of the King",genre:"Fantasy",language:"English",duration:"201m",rating:"9.0"},
+{id:145,title:"Harry Potter and the Sorcerer's Stone",genre:"Fantasy",language:"English",duration:"152m",rating:"7.6"},
+{id:146,title:"Harry Potter and the Prisoner of Azkaban",genre:"Fantasy",language:"English",duration:"142m",rating:"7.9"},
+{id:147,title:"Harry Potter and the Deathly Hallows 2",genre:"Fantasy",language:"English",duration:"130m",rating:"8.1"},
+{id:148,title:"The Hobbit: An Unexpected Journey",genre:"Fantasy",language:"English",duration:"169m",rating:"7.8"},
+{id:149,title:"Game of Thrones",genre:"Fantasy",language:"English",duration:"Series",rating:"9.2"},
+{id:150,title:"The Witcher",genre:"Fantasy",language:"English",duration:"Series",rating:"8.2"},
+{id:151,title:"House of the Dragon",genre:"Fantasy",language:"English",duration:"Series",rating:"8.4"},
+{id:152,title:"Wednesday",genre:"Fantasy",language:"English",duration:"Series",rating:"8.1"},
+{id:153,title:"Lucifer",genre:"Fantasy",language:"English",duration:"Series",rating:"8.1"},
+{id:154,title:"Shadow and Bone",genre:"Fantasy",language:"English",duration:"Series",rating:"7.6"},
+{id:155,title:"The Wheel of Time",genre:"Fantasy",language:"English",duration:"Series",rating:"7.1"},
+{id:156,title:"Alchemy of Souls",genre:"Fantasy",language:"Korean",duration:"Series",rating:"8.6"},
+{id:157,title:"Bahubali: The Beginning",genre:"Fantasy",language:"Telugu",duration:"159m",rating:"8.0"},
+{id:158,title:"Bahubali 2: The Conclusion",genre:"Fantasy",language:"Telugu",duration:"167m",rating:"8.2"},
+{id:159,title:"Brahmāstra",genre:"Fantasy",language:"Hindi",duration:"167m",rating:"5.6"},
+{id:160,title:"Doctor Strange in the Multiverse",genre:"Fantasy",language:"English",duration:"126m",rating:"6.9"},
+{id:161,title:"Pan's Labyrinth",genre:"Fantasy",language:"Spanish",duration:"118m",rating:"8.2"},
+{id:162,title:"The Chronicles of Narnia",genre:"Fantasy",language:"English",duration:"143m",rating:"6.9"},
+{id:163,title:"Umbrella Academy",genre:"Fantasy",language:"English",duration:"Series",rating:"7.9"},
+
+// ── COMEDY (22) ──
+{id:164,title:"The Grand Budapest Hotel",genre:"Comedy",language:"English",duration:"99m",rating:"8.1"},
+{id:165,title:"Superbad",genre:"Comedy",language:"English",duration:"113m",rating:"7.6"},
+{id:166,title:"The Hangover",genre:"Comedy",language:"English",duration:"100m",rating:"7.7"},
+{id:167,title:"Hera Pheri",genre:"Comedy",language:"Hindi",duration:"156m",rating:"8.2"},
+{id:168,title:"Andaz Apna Apna",genre:"Comedy",language:"Hindi",duration:"160m",rating:"8.2"},
+{id:169,title:"Dhamaal",genre:"Comedy",language:"Hindi",duration:"118m",rating:"7.0"},
+{id:170,title:"Stree (Comedy-Horror)",genre:"Comedy",language:"Hindi",duration:"129m",rating:"7.5"},
+{id:171,title:"Chhichhore",genre:"Comedy",language:"Hindi",duration:"143m",rating:"7.8"},
+{id:172,title:"Munna Bhai M.B.B.S.",genre:"Comedy",language:"Hindi",duration:"156m",rating:"8.1"},
+{id:173,title:"PK",genre:"Comedy",language:"Hindi",duration:"153m",rating:"8.1"},
+{id:174,title:"Shubh Mangal Savdhan",genre:"Comedy",language:"Hindi",duration:"119m",rating:"7.2"},
+{id:175,title:"The Office",genre:"Comedy",language:"English",duration:"Series",rating:"9.0"},
+{id:176,title:"Friends",genre:"Comedy",language:"English",duration:"Series",rating:"8.9"},
+{id:177,title:"Brooklyn Nine-Nine",genre:"Comedy",language:"English",duration:"Series",rating:"8.4"},
+{id:178,title:"Ted Lasso",genre:"Comedy",language:"English",duration:"Series",rating:"8.8"},
+{id:179,title:"Schitt's Creek",genre:"Comedy",language:"English",duration:"Series",rating:"8.5"},
+{id:180,title:"Fleabag",genre:"Comedy",language:"English",duration:"Series",rating:"8.7"},
+{id:181,title:"The Good Place",genre:"Comedy",language:"English",duration:"Series",rating:"8.2"},
+{id:182,title:"Silicon Valley",genre:"Comedy",language:"English",duration:"Series",rating:"8.5"},
+{id:183,title:"Panchayat S2",genre:"Comedy",language:"Hindi",duration:"Series",rating:"9.0"},
+{id:184,title:"The Marvelous Mrs. Maisel",genre:"Comedy",language:"English",duration:"Series",rating:"8.7"},
+{id:185,title:"Veep",genre:"Comedy",language:"English",duration:"Series",rating:"8.3"},
+
+// ── ROMANCE (20) ──
+{id:186,title:"La La Land",genre:"Romance",language:"English",duration:"128m",rating:"8.0"},
+{id:187,title:"Titanic",genre:"Romance",language:"English",duration:"194m",rating:"7.9"},
+{id:188,title:"The Notebook",genre:"Romance",language:"English",duration:"123m",rating:"7.8"},
+{id:189,title:"Before Sunrise",genre:"Romance",language:"English",duration:"101m",rating:"8.1"},
+{id:190,title:"Before Sunset",genre:"Romance",language:"English",duration:"80m",rating:"8.1"},
+{id:191,title:"Dilwale Dulhania Le Jayenge",genre:"Romance",language:"Hindi",duration:"190m",rating:"8.0"},
+{id:192,title:"Jab We Met",genre:"Romance",language:"Hindi",duration:"138m",rating:"7.9"},
+{id:193,title:"Veer-Zaara",genre:"Romance",language:"Hindi",duration:"192m",rating:"7.8"},
+{id:194,title:"Rockstar",genre:"Romance",language:"Hindi",duration:"159m",rating:"7.7"},
+{id:195,title:"Aashiqui 2",genre:"Romance",language:"Hindi",duration:"132m",rating:"7.5"},
+{id:196,title:"Crash Landing on You",genre:"Romance",language:"Korean",duration:"Series",rating:"8.7"},
+{id:197,title:"Business Proposal",genre:"Romance",language:"Korean",duration:"Series",rating:"8.1"},
+{id:198,title:"Bridgerton",genre:"Romance",language:"English",duration:"Series",rating:"7.3"},
+{id:199,title:"Normal People",genre:"Romance",language:"English",duration:"Series",rating:"8.2"},
+{id:200,title:"Pride & Prejudice",genre:"Romance",language:"English",duration:"129m",rating:"7.8"},
+{id:201,title:"Eternal Sunshine of the Spotless Mind",genre:"Romance",language:"English",duration:"108m",rating:"8.3"},
+{id:202,title:"500 Days of Summer",genre:"Romance",language:"English",duration:"95m",rating:"7.7"},
+{id:203,title:"Queen",genre:"Romance",language:"Hindi",duration:"146m",rating:"7.9"},
+{id:204,title:"Yeh Jawaani Hai Deewani",genre:"Romance",language:"Hindi",duration:"160m",rating:"7.1"},
+{id:205,title:"My Love from the Star",genre:"Romance",language:"Korean",duration:"Series",rating:"8.2"},
+];
+
+// ════════════════════════════════════════════════════════════════
+//  GENRE ICONS
+// ════════════════════════════════════════════════════════════════
+const genreIcons={Action:'⚡',Thriller:'🎯',Drama:'🎭',Comedy:'😂','Sci-Fi':'🚀',Crime:'🔫',Horror:'👻',Fantasy:'🐉',Romance:'💕'};
+const genreClasses={Action:'genre-action',Thriller:'genre-thriller',Drama:'genre-drama',Comedy:'genre-comedy','Sci-Fi':'genre-sci-fi',Crime:'genre-crime',Horror:'genre-horror',Fantasy:'genre-fantasy',Romance:'genre-romance'};
+
+// ════════════════════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════════════════════
+let activeGenre='';
+let displayCount=40; // show 40 initially
+const PAGE_SIZE=40;
+let debounceTimer;
+
+// ════════════════════════════════════════════════════════════════
+//  INIT: build genre tabs + stats
+// ════════════════════════════════════════════════════════════════
+(function init(){
+  // Stats
+  const genres=[...new Set(movies.map(m=>m.genre))];
+  const langs=[...new Set(movies.map(m=>m.language))];
+  document.getElementById('totalCount').textContent=movies.length;
+  document.getElementById('genreCount').textContent=genres.length;
+  document.getElementById('langCount').textContent=langs.length;
+
+  // Genre tabs
+  const tabsHTML=`<button class="genre-tab active" onclick="setGenre('',this)"><span>All (${movies.length})</span></button>`+
+    genres.map(g=>{
+      const count=movies.filter(m=>m.genre===g).length;
+      return `<button class="genre-tab" onclick="setGenre('${g}',this)"><span>${g} (${count})</span></button>`;
+    }).join('');
+  document.getElementById('genreTabs').innerHTML=tabsHTML;
+
+  renderMovies();
+})();
+
+// ════════════════════════════════════════════════════════════════
+//  SET GENRE
+// ════════════════════════════════════════════════════════════════
+function setGenre(genre,btn){
+  activeGenre=genre;
+  displayCount=PAGE_SIZE;
+  document.querySelectorAll('.genre-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('sectionTitle').textContent=genre?genre:'All Titles';
+  renderMovies();
+}
+
+// ════════════════════════════════════════════════════════════════
+//  FILTER + SORT
+// ════════════════════════════════════════════════════════════════
+function getFiltered(){
+  const search=document.getElementById('searchInput').value.toLowerCase().trim();
+  const sort=document.getElementById('sortSelect').value;
+
+  let filtered=movies.filter(m=>{
+    if(activeGenre && m.genre!==activeGenre) return false;
+    if(search && !m.title.toLowerCase().includes(search) && !m.language.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  switch(sort){
+    case 'title-asc': filtered.sort((a,b)=>a.title.localeCompare(b.title)); break;
+    case 'title-desc': filtered.sort((a,b)=>b.title.localeCompare(a.title)); break;
+    case 'rating-desc': filtered.sort((a,b)=>parseFloat(b.rating)-parseFloat(a.rating)); break;
+    case 'rating-asc': filtered.sort((a,b)=>parseFloat(a.rating)-parseFloat(b.rating)); break;
+  }
+  return filtered;
+}
+
+// ════════════════════════════════════════════════════════════════
+//  RENDER
+// ════════════════════════════════════════════════════════════════
+function renderMovies(){
+  const filtered=getFiltered();
+  const visible=filtered.slice(0,displayCount);
+  const grid=document.getElementById('grid');
+
+  document.getElementById('resultsCount').textContent=`${filtered.length} title${filtered.length!==1?'s':''}`;
+
+  if(!visible.length){
+    grid.innerHTML=`<div class="empty-state"><div class="icon">🎬</div><p>No titles found</p><div class="sub">Try a different search or genre</div></div>`;
+    document.getElementById('loadMoreWrap').style.display='none';
+    return;
+  }
+
+  grid.innerHTML=visible.map((m,i)=>{
+    const gc=genreClasses[m.genre]||'genre-action';
+    const cardGenreClass='card-genre-'+m.genre.toLowerCase().replace(/[^a-z]/g,'-');
+    const delay=Math.min(i*30,600);
+    return `
+    <div class="movie-card ${cardGenreClass}" style="animation-delay:${delay}ms" onclick="openModal(${m.id})">
+      <div class="poster"></div>
+      <div class="rating">${m.rating>=8.0?'TV-MA':m.rating>=7.0?'TV-14':'TV-PG'}</div>
+      <div class="info">
+        <h3>${m.title}</h3>
+        <p class="meta">${m.language} • ${m.duration}</p>
+        <span class="genre-badge ${gc}">${m.genre}</span>
+      </div>
+      <button class="watch-btn" onclick="event.stopPropagation();watchMovie(movies.find(x=>x.id===${m.id}))">Watch Now</button>
+    </div>`;
+  }).join('');
+
+  // Show/hide load more
+  const wrap=document.getElementById('loadMoreWrap');
+  if(displayCount<filtered.length){
+    wrap.style.display='block';
+    document.getElementById('loadMoreBtn').textContent=`Load More (${filtered.length-displayCount} remaining)`;
+  }else{
+    wrap.style.display='none';
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+//  LOAD MORE
+// ════════════════════════════════════════════════════════════════
+function loadMore(){
+  displayCount+=PAGE_SIZE;
+  renderMovies();
+  // Smooth scroll to newly loaded cards
+}
+
+// ════════════════════════════════════════════════════════════════
+//  DEBOUNCE SEARCH
+// ════════════════════════════════════════════════════════════════
+function debounceRender(){
+  clearTimeout(debounceTimer);
+  displayCount=PAGE_SIZE;
+  debounceTimer=setTimeout(renderMovies,250);
+}
+</script>
+</body>
+</html>

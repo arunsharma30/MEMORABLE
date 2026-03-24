@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Watch History – Memorable</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--red:#e50914;--bg:#141414;--card2:#222;--muted:#aaa;--border:#2e2e2e;--sidebar:240px}
+body{background:var(--bg);color:#fff;font-family:'DM Sans',sans-serif;display:flex;min-height:100vh}
+.sidebar{width:var(--sidebar);background:#0d0d0d;border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100}
+.sidebar .logo{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--red);padding:28px 24px 20px;letter-spacing:2px;border-bottom:1px solid var(--border)}
+.sidebar nav{flex:1;padding:16px 0}
+.sidebar nav a{display:flex;align-items:center;gap:12px;padding:13px 24px;color:var(--muted);text-decoration:none;font-size:.92rem;transition:.2s;border-left:3px solid transparent}
+.sidebar nav a svg{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;transition:.2s}
+.sidebar nav a:hover,.sidebar nav a.active{color:#fff;background:rgba(229,9,20,.07);border-left-color:var(--red)}
+.sidebar-footer{padding:20px 24px;border-top:1px solid var(--border)}
+.sidebar-footer .uname{font-size:.85rem;color:#fff;font-weight:500;margin-bottom:2px}
+.sidebar-footer .uemail{font-size:.75rem;color:var(--muted)}
+.sidebar-footer button{display:inline-block;margin-top:12px;padding:6px 14px;background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:.8rem;cursor:pointer;transition:.2s;font-family:'DM Sans',sans-serif}
+.sidebar-footer button:hover{border-color:var(--red);color:var(--red)}
+.main{margin-left:var(--sidebar);flex:1;padding:40px 48px}
+.page-header{margin-bottom:32px}
+.page-header h1{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:1px}
+.page-header p{color:var(--muted);font-size:.9rem;margin-top:4px}
+.stat-row{display:flex;gap:12px;margin-bottom:28px;flex-wrap:wrap}
+.stat-pill{padding:10px 20px;background:#1c1c1c;border:1px solid var(--border);border-radius:10px;font-size:.82rem}
+.stat-pill span{font-weight:600;color:var(--red);font-size:1.1rem;display:block}
+.history-row{display:flex;align-items:center;gap:16px;padding:14px 16px;border-radius:10px;border:1px solid transparent;margin-bottom:8px;background:var(--card2);transition:.2s}
+.history-row:hover{border-color:var(--border);background:#252525}
+.history-thumb{width:52px;height:52px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
+.history-info{flex:1}
+.history-info h4{font-size:.92rem;font-weight:500;margin-bottom:3px}
+.history-info .meta{font-size:.78rem;color:var(--muted)}
+.history-date{font-size:.78rem;color:#666;text-align:right;white-space:nowrap}
+.loading{text-align:center;padding:40px;color:var(--muted)}
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty .emoji{font-size:3rem;margin-bottom:12px}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="logo">Memorable</div>
+  <nav>
+    <a href="browse.html">
+      <svg viewBox="0 0 24 24">
+        <rect x="3" y="5" width="18" height="14" rx="2" ry="2"/>
+        <path d="M10 8v8M14 8v8"/>
+      </svg>
+      Browse
+    </a>
+    <a href="subscription.html">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+      </svg>
+      Subscription
+    </a>
+    <a href="history.html" class="active">
+      <svg viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+      Watch History
+    </a>
+    <a href="payments.html">
+      <svg viewBox="0 0 24 24">
+        <rect x="2" y="5" width="20" height="14" rx="2" ry="2"/>
+        <line x1="2" y1="10" x2="22" y2="10"/>
+      </svg>
+      Payments
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="uname" id="uname"></div>
+    <div class="uemail" id="uemail"></div>
+    <button onclick="logout()">Sign Out</button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header"><h1>Watch History</h1><p>Everything you've watched</p></div>
+  <div class="stat-row" id="stats"></div>
+  <div id="list"><div class="loading">Loading history...</div></div>
+</main>
+
+<script>
+const API='http://localhost:3000/api';
+const u=sessionStorage.getItem('user');
+if(!u)window.location.href='index.html';
+const user=JSON.parse(u||'{}');
+document.getElementById('uname').textContent=user.Name||'';
+document.getElementById('uemail').textContent=user.Email||'';
+function logout(){sessionStorage.removeItem('user');window.location.href='index.html';}
+
+const gColors={'Sci-Fi':'#4a90e2','Thriller':'#e74c3c','Drama':'#9b59b6','Crime':'#e67e22','Horror':'#c0392b','Fantasy':'#16a085','Comedy':'#f39c12','Action':'#d35400','Mystery':'#1abc9c'};
+function gc(g){if(!g)return'#e50914';for(const[k,v]of Object.entries(gColors))if(g&&g.toLowerCase().includes(k.toLowerCase()))return v;return'#e50914';}
+function ge(g){return 'M';}
+
+async function loadHistory(){
+  const list=document.getElementById('list');
+  try{
+    const r=await fetch(`${API}/history/${user.User_ID}`);
+    const items=await r.json();
+    const total=items.reduce((a,i)=>a+(i.Duration||0),0);
+    const genres=[...new Set(items.map(i=>i.Genre?.split('/')[0].trim()))].filter(Boolean);
+    document.getElementById('stats').innerHTML=`
+      <div class="stat-pill"><span>${items.length}</span>Titles Watched</div>
+      <div class="stat-pill"><span>${Math.round(total/60)}h</span>Watch Time</div>
+      <div class="stat-pill"><span>${genres.length}</span>Genres</div>`;
+    if(!items.length){list.innerHTML=`<div class="empty"><p>No watch history yet.<br>Go to Browse and start watching!</p></div>`;return;}
+    list.innerHTML=items.map(h=>{
+      const dt=new Date(h.Watch_Date).toLocaleDateString('en-IN',{year:'numeric',month:'short',day:'numeric'});
+      return`<div class="history-row">
+        <div class="history-thumb" style="background:${gc(h.Genre)}22">${ge(h.Genre)}</div>
+        <div class="history-info">
+          <h4>${h.Title}</h4>
+          <div class="meta">${h.Genre||'—'} • ${h.Language} • ${h.Duration?h.Duration+'m':'Series'}</div>
+        </div>
+        <div class="history-date">Watched<br>${dt}</div>
+      </div>`;
+    }).join('');
+  }catch(e){list.innerHTML=`<div class="loading">${e.message}</div>`;}
+}
+loadHistory();
+</script>
+</body>
+</html>

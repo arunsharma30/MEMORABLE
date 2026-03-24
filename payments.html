@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Payments – Memorable</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--red:#e50914;--bg:#141414;--card:#1c1c1c;--card2:#222;--muted:#aaa;--border:#2e2e2e;--sidebar:240px}
+body{background:var(--bg);color:#fff;font-family:'DM Sans',sans-serif;display:flex;min-height:100vh}
+.sidebar{width:var(--sidebar);background:#0d0d0d;border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100}
+.sidebar .logo{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--red);padding:28px 24px 20px;letter-spacing:2px;border-bottom:1px solid var(--border)}
+.sidebar nav{flex:1;padding:16px 0}
+.sidebar nav a{display:flex;align-items:center;gap:12px;padding:13px 24px;color:var(--muted);text-decoration:none;font-size:.92rem;transition:.2s;border-left:3px solid transparent}
+.sidebar nav a svg{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;transition:.2s}
+.sidebar nav a:hover,.sidebar nav a.active{color:#fff;background:rgba(229,9,20,.07);border-left-color:var(--red)}
+.sidebar-footer{padding:20px 24px;border-top:1px solid var(--border)}
+.sidebar-footer .uname{font-size:.85rem;color:#fff;font-weight:500;margin-bottom:2px}
+.sidebar-footer .uemail{font-size:.75rem;color:var(--muted)}
+.sidebar-footer button{display:inline-block;margin-top:12px;padding:6px 14px;background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:.8rem;cursor:pointer;transition:.2s;font-family:'DM Sans',sans-serif}
+.sidebar-footer button:hover{border-color:var(--red);color:var(--red)}
+.main{margin-left:var(--sidebar);flex:1;padding:40px 48px}
+.page-header{margin-bottom:32px}
+.page-header h1{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:1px}
+.page-header p{color:var(--muted);font-size:.9rem;margin-top:4px}
+.total-card{background:linear-gradient(135deg,rgba(229,9,20,.08),rgba(229,9,20,.02));border:1px solid rgba(229,9,20,.25);border-radius:16px;padding:28px;margin-bottom:32px;display:flex;align-items:center;justify-content:space-between}
+.total-card .label{color:var(--muted);font-size:.85rem;margin-bottom:6px}
+.total-card .amount{font-family:'Bebas Neue',sans-serif;font-size:3rem;letter-spacing:2px;color:var(--red)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+table th{text-align:left;padding:12px 16px;color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border)}
+table td{padding:13px 16px;border-bottom:1px solid #1e1e1e;color:#ddd}
+table tr:last-child td{border-bottom:none}
+table tr:hover td{background:rgba(255,255,255,.02)}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.73rem;font-weight:500}
+.badge.completed{background:rgba(46,213,115,.15);color:#2ed573}
+.badge.pending{background:rgba(255,193,7,.1);color:#ffc107}
+.badge.failed{background:rgba(255,71,71,.1);color:#ff4747}
+.loading{text-align:center;padding:40px;color:var(--muted)}
+.empty{text-align:center;padding:60px;color:var(--muted)}
+.empty .emoji{font-size:3rem;margin-bottom:12px}
+/* FILTERS & CONTROLS */
+.controls{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.controls select{padding:8px 12px;background:#1a1a1a;border:1px solid var(--border);border-radius:6px;color:#fff;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer}
+.controls select:focus{outline:none;border-color:var(--red)}
+.controls select option{background:#1f1f1f}
+/* TRANSACTION ROW STYLES */
+table tbody tr{cursor:pointer;transition:.2s}
+table tbody tr:hover td{background:rgba(229,9,20,.08);border-bottom-color:rgba(229,9,20,.15)}
+.method-icon{width:20px;height:20px;display:inline-block;margin-right:6px;vertical-align:middle;stroke:currentColor;stroke-width:2;fill:none}
+/* MODAL STYLES */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:1000;opacity:0;visibility:hidden;transition:.3s;display:flex;align-items:center;justify-content:center}
+.modal-overlay.active{opacity:1;visibility:visible}
+.modal-box{background:linear-gradient(135deg,#1a1a1a 0%,#0d0d0d 100%);border-radius:16px;max-width:600px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.8);border:1px solid #333;padding:32px;max-height:90vh;overflow-y:auto}
+.modal-box h2{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:1px;margin-bottom:24px}
+.modal-box .close{position:absolute;top:20px;right:20px;background:none;border:none;color:#fff;font-size:28px;cursor:pointer;transition:.2s}
+.modal-box .close:hover{color:var(--red)}
+.detail-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)}
+.detail-row:last-child{border-bottom:none}
+.detail-label{color:var(--muted);font-size:.9rem}
+.detail-value{color:#fff;font-weight:500;text-align:right}
+.modal-actions{display:flex;gap:12px;margin-top:28px}
+.modal-btn{flex:1;padding:12px;border:none;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.2s}
+.modal-btn.primary{background:var(--red);color:#fff}
+.modal-btn.primary:hover{background:#b81d24}
+.modal-btn.secondary{background:#1c1c1c;color:var(--muted);border:1px solid #333}
+.modal-btn.secondary:hover{border-color:var(--red);color:var(--red)}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="logo">Memorable</div>
+  <nav>
+    <a href="browse.html">
+      <svg viewBox="0 0 24 24">
+        <rect x="3" y="5" width="18" height="14" rx="2" ry="2"/>
+        <path d="M10 8v8M14 8v8"/>
+      </svg>
+      Browse
+    </a>
+    <a href="subscription.html">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+      </svg>
+      Subscription
+    </a>
+    <a href="history.html">
+      <svg viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+      Watch History
+    </a>
+    <a href="payments.html" class="active">
+      <svg viewBox="0 0 24 24">
+        <rect x="2" y="5" width="20" height="14" rx="2" ry="2"/>
+        <line x1="2" y1="10" x2="22" y2="10"/>
+      </svg>
+      Payments
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="uname" id="uname"></div>
+    <div class="uemail" id="uemail"></div>
+    <button onclick="logout()">Sign Out</button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header"><h1>Payments</h1><p>Your billing and transaction history</p></div>
+  <div class="total-card">
+    <div><div class="label">Total Spent</div><div class="amount" id="total-amt">₹0</div></div>
+    <div style="text-align:right"><div class="label">Transactions</div><div class="amount" id="total-count">0</div></div>
+  </div>
+  
+  <div class="card">
+    <div class="controls">
+      <select id="statusFilter" onchange="filterByStatus()">
+        <option value="">All Status</option>
+        <option value="completed">Successful</option>
+        <option value="pending">Pending</option>
+        <option value="failed">Failed</option>
+      </select>
+      <select id="sortBy" onchange="sortTransactions()">
+        <option value="date-desc">Latest First</option>
+        <option value="date-asc">Oldest First</option>
+        <option value="amount-desc">Highest Amount</option>
+        <option value="amount-asc">Lowest Amount</option>
+      </select>
+    </div>
+    
+    <table>
+      <thead><tr><th>#</th><th>Date</th><th>Plan</th><th>Amount</th><th>Method</th><th>Status</th></tr></thead>
+      <tbody id="tbody"><tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted)">Loading...</td></tr></tbody>
+    </table>
+  </div>
+</main>
+
+<!-- TRANSACTION DETAILS MODAL -->
+<div class="modal-overlay" id="transactionModal">
+  <div class="modal-box" style="position:relative">
+    <button class="close" onclick="closeTransactionModal()">✕</button>
+    <h2>Transaction Details</h2>
+    
+    <div class="detail-row">
+      <span class="detail-label">Transaction ID</span>
+      <span class="detail-value" id="detailID">-</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Date</span>
+      <span class="detail-value" id="detailDate">-</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Plan</span>
+      <span class="detail-value" id="detailPlan">-</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Amount</span>
+      <span class="detail-value" id="detailAmount">-</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Payment Method</span>
+      <span class="detail-value" id="detailMethod">-</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Status</span>
+      <span class="detail-value" id="detailStatus">-</span>
+    </div>
+    <div class="detail-row" id="durationRow" style="display:none">
+      <span class="detail-label">Subscription Duration</span>
+      <span class="detail-value" id="detailDuration">-</span>
+    </div>
+    
+    <div class="modal-actions">
+      <button class="modal-btn secondary" onclick="closeTransactionModal()">Close</button>
+      <button class="modal-btn primary" onclick="downloadReceipt()">Download Receipt</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API='http://localhost:3000/api';
+const u=sessionStorage.getItem('user');
+if(!u)window.location.href='index.html';
+const user=JSON.parse(u||'{}');
+document.getElementById('uname').textContent=user.Name||'';
+document.getElementById('uemail').textContent=user.Email||'';
+function logout(){sessionStorage.removeItem('user');window.location.href='index.html';}
+
+// SVG Icons for payment methods
+const paymentMethodIcons={
+  'UPI':'<svg class="method-icon" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/><circle cx="7" cy="15" r="1.5"/><circle cx="17" cy="15" r="1.5"/></svg>',
+  'Credit Card':'<svg class="method-icon" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/></svg>',
+  'Debit Card':'<svg class="method-icon" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/></svg>',
+  'Net Banking':'<svg class="method-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/><path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>',
+  'Wallet':'<svg class="method-icon" viewBox="0 0 24 24"><path d="M21 18v-2h-3V9c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zm-2-2v2H5V9h11v7zm-6-2c.83 0 1.5-.67 1.5-1.5S13.83 10 13 10s-1.5.67-1.5 1.5.67 1.5 1.5 1.5z"/></svg>'
+};
+
+// Get payment method icon HTML
+function getPaymentIcon(method){
+  return paymentMethodIcons[method]||'<svg class="method-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>';
+}
+
+// Store all transactions for filtering/sorting
+let allTransactions=[];
+let filteredTransactions=[];
+
+// Get badge class based on status
+function getBadgeClass(status){
+  const s=status?.toLowerCase()||'pending';
+  if(s==='completed'||s==='successful')return 'completed';
+  if(s==='pending')return 'pending';
+  if(s==='failed')return 'failed';
+  return 'pending';
+}
+
+// Get display text for status
+function getStatusText(status){
+  const s=status?.toLowerCase()||'pending';
+  if(s==='completed'||s==='successful')return 'Successful';
+  if(s==='pending')return 'Pending';
+  if(s==='failed')return 'Failed';
+  return status;
+}
+
+async function loadPayments(){
+  const tbody=document.getElementById('tbody');
+  try{
+    const r=await fetch(`${API}/payments/${user.User_ID}`);
+    const items=await r.json();
+    
+    // Assign user-specific transaction numbers (starting from 1)
+    const itemsWithNumbers=items.map((transaction,index)=>({
+      ...transaction,
+      userTransactionNumber:index+1
+    }));
+    
+    allTransactions=itemsWithNumbers;
+    filteredTransactions=itemsWithNumbers;
+    
+    const total=items.reduce((a,i)=>a+parseFloat(i.Amount),0);
+    document.getElementById('total-amt').textContent=`₹${total.toLocaleString('en-IN')}`;
+    document.getElementById('total-count').textContent=items.length;
+    
+    if(!items.length){
+      tbody.innerHTML=`<tr><td colspan="6"><div class="empty"><p>No payments yet. Start your subscription to make your first payment!</p></div></td></tr>`;
+      return;
+    }
+    
+    renderTransactions(itemsWithNumbers);
+  }catch(e){
+    tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted)">${e.message}</td></tr>`;
+  }
+}
+
+function renderTransactions(transactions){
+  const tbody=document.getElementById('tbody');
+  tbody.innerHTML=transactions.map((p,idx)=>{
+    const dt=new Date(p.Payment_Date).toLocaleDateString('en-IN',{year:'numeric',month:'short',day:'numeric'});
+    const badgeClass=getBadgeClass(p.Payment_Status);
+    const statusText=getStatusText(p.Payment_Status);
+    return`<tr onclick="openTransactionModal(${idx})">
+      <td style="color:var(--muted)">#${p.userTransactionNumber}</td>
+      <td>${dt}</td>
+      <td>${p.Plan_Name}</td>
+      <td style="color:#fff;font-weight:500">₹${parseFloat(p.Amount).toLocaleString('en-IN')}</td>
+      <td>${getPaymentIcon(p.Payment_Method)} ${p.Payment_Method||'—'}</td>
+      <td><span class="badge ${badgeClass}">${statusText}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// Filter transactions by status
+function filterByStatus(){
+  const status=document.getElementById('statusFilter').value;
+  if(!status){
+    filteredTransactions=allTransactions;
+  }else{
+    filteredTransactions=allTransactions.filter(t=>getBadgeClass(t.Payment_Status)===status);
+  }
+  renderTransactions(filteredTransactions);
+}
+
+// Sort transactions
+function sortTransactions(){
+  const sortBy=document.getElementById('sortBy').value;
+  let sorted=[...filteredTransactions];
+  
+  if(sortBy==='date-desc'){
+    sorted.sort((a,b)=>new Date(b.Payment_Date)-new Date(a.Payment_Date));
+  }else if(sortBy==='date-asc'){
+    sorted.sort((a,b)=>new Date(a.Payment_Date)-new Date(b.Payment_Date));
+  }else if(sortBy==='amount-desc'){
+    sorted.sort((a,b)=>parseFloat(b.Amount)-parseFloat(a.Amount));
+  }else if(sortBy==='amount-asc'){
+    sorted.sort((a,b)=>parseFloat(a.Amount)-parseFloat(b.Amount));
+  }
+  
+  renderTransactions(sorted);
+}
+
+// Show transaction details modal
+let currentTransactionIndex=-1;
+function openTransactionModal(index){
+  currentTransactionIndex=index;
+  const p=filteredTransactions[index];
+  const dt=new Date(p.Payment_Date).toLocaleDateString('en-IN',{year:'numeric',month:'short',day:'numeric'});
+  const badgeClass=getBadgeClass(p.Payment_Status);
+  const statusText=getStatusText(p.Payment_Status);
+  
+  document.getElementById('detailID').textContent=`#${p.userTransactionNumber}`;
+  document.getElementById('detailDate').textContent=dt;
+  document.getElementById('detailPlan').textContent=p.Plan_Name||'-';
+  document.getElementById('detailAmount').textContent=`₹${parseFloat(p.Amount).toLocaleString('en-IN')}`;
+  document.getElementById('detailMethod').textContent=p.Payment_Method||'-';
+  document.getElementById('detailStatus').innerHTML=`<span class="badge ${badgeClass}">${statusText}</span>`;
+  
+  // Show duration if available
+  if(p.Subscription_Duration){
+    document.getElementById('durationRow').style.display='flex';
+    document.getElementById('detailDuration').textContent=p.Subscription_Duration;
+  }else{
+    document.getElementById('durationRow').style.display='none';
+  }
+  
+  document.getElementById('transactionModal').classList.add('active');
+}
+
+function closeTransactionModal(){
+  document.getElementById('transactionModal').classList.remove('active');
+  currentTransactionIndex=-1;
+}
+
+// Download receipt (placeholder)
+function downloadReceipt(){
+  const p=filteredTransactions[currentTransactionIndex];
+  const receiptText=`
+MEMORABLE - Payment Receipt
+=============================
+Transaction ID: #${p.userTransactionNumber}
+Date: ${new Date(p.Payment_Date).toLocaleDateString('en-IN')}
+Plan: ${p.Plan_Name}
+Amount: ₹${parseFloat(p.Amount).toLocaleString('en-IN')}
+Payment Method: ${p.Payment_Method}
+Status: ${getStatusText(p.Payment_Status)}
+
+Thank you for your subscription!
+  `.trim();
+  
+  const blob=new Blob([receiptText],{type:'text/plain'});
+  const url=window.URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`receipt-${p.userTransactionNumber}.txt`;
+  a.click();
+  window.URL.revokeObjectURL(url);
+}
+
+// Close modal when clicking overlay
+document.getElementById('transactionModal')?.addEventListener('click',function(e){
+  if(e.target===this)closeTransactionModal();
+});
+
+// Close on Escape key
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'&&document.getElementById('transactionModal')?.classList.contains('active')){
+    closeTransactionModal();
+  }
+});
+
+loadPayments();
+</script>
+</body>
+</html>
